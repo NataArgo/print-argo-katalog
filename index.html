@@ -2521,6 +2521,13 @@ if(ROOMS[start])state.room=start;
 urlToState();
 if(state.q){const qi=$("#q");if(qi){qi.value=state.q;const qc=$("#qClear");if(qc)qc.style.display="flex";}}
 render();
+// відкрити картку макета, якщо перейшли за посиланням ?maket=ID
+(function(){
+  const mk=new URLSearchParams(location.search).get("maket");
+  if(!mk)return;
+  const p=D.banery.find(d=>String(d.id).toLowerCase()===mk.toLowerCase());
+  if(p){setTimeout(()=>openProduct({...p,kind:"banner"}),200);}
+})();
 </script>
 
 <div id="igModalCat" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:100000; align-items:center; justify-content:center; padding:20px;">
