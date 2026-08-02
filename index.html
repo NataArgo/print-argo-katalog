@@ -267,6 +267,10 @@ body.admin .psrc{display:block}
 .argo-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .shareM{border-color:var(--accent)!important;color:var(--accent)!important}
 .shareM svg{stroke:var(--accent)}
+.search{position:relative}
+.qclear{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:22px;height:22px;border:none;background:rgba(0,0,0,.08);border-radius:50%;font-size:12px;color:var(--ink);cursor:pointer;align-items:center;justify-content:center;line-height:1;padding:0}
+.qclear:hover{background:rgba(0,0,0,.16)}
+.chipreset{background:var(--tint);font-weight:700;border-color:var(--line)}
 .shlbl{font-size:12px;font-weight:700;color:var(--gray);margin:14px 0 8px;letter-spacing:.06em;text-transform:uppercase}
 .shchips{display:flex;flex-wrap:wrap;gap:7px}
 .shc{padding:8px 13px;border-radius:99px;border:1px solid var(--line);background:#fff;font-size:13.5px;font-weight:600;transition:all .12s}
@@ -347,7 +351,7 @@ body.admin .v::after{content:" · адмін";color:#C2452D;font-weight:700}
     <div class="hspace"></div>
     <div class="search">
       <svg fill="none" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input id="q" type="search" placeholder="Пошук" autocomplete="off">
+      <input id="q" type="search" placeholder="Пошук" autocomplete="off"><button class="qclear" id="qClear" aria-label="Очистити пошук" style="display:none">✕</button>
     </div>
     <button class="calcbtn" id="shareBtn" title="Скопіювати посилання на цю добірку">Поділитися</button>
       <button class="calcbtn" id="openCalc">Калькулятор</button>
@@ -2151,6 +2155,12 @@ function renderMbar(){
   fb.innerHTML=`<svg fill="none" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></svg>Фільтри${n?` · <b>${n}</b>`:""}`;
   fb.onclick=openSheet;mb.appendChild(fb);
   activeChips().forEach(c=>mb.appendChild(c));
+  if(activeCount()>0){
+    const rc=document.createElement('button');rc.className="achip chipreset";
+    rc.innerHTML=`Скинути все <svg fill="none" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
+    rc.onclick=()=>{resetFiltersOnly();render();};
+    mb.appendChild(rc);
+  }
   const cnt=document.createElement('span');cnt.className="fcount";cnt.id="countM";
   cnt.style.marginLeft="auto";mb.appendChild(cnt);
   const shb=document.createElement('button');shb.className="fbtn shareM";
@@ -2199,6 +2209,9 @@ function urlToState(){
 }
 function resetFilters(){
   state.event=null;state.tag=null;state.age=null;state.who=null;state.colors=[];state.q="";
+}
+function resetFiltersOnly(){
+  state.event=null;state.tag=null;state.age=null;state.who=null;state.colors=[];
 }
 
 // ── sheet (мобільний) ──
@@ -2425,7 +2438,8 @@ $("#logo").addEventListener("click",e=>{
   }
 });
 
-$("#q").addEventListener("input",e=>{state.q=e.target.value.trim().toLowerCase();render();});
+$("#q").addEventListener("input",e=>{state.q=e.target.value.trim().toLowerCase();const qc=$("#qClear");if(qc)qc.style.display=e.target.value?"flex":"none";render();});
+$("#qClear").onclick=()=>{const inp=$("#q");inp.value="";state.q="";$("#qClear").style.display="none";inp.focus();render();};
 
 $("#shShow").onclick=()=>{closeSheet();render();};
 $("#shX").onclick=()=>{closeSheet();render();};
@@ -2488,6 +2502,7 @@ buildMega();buildDrawer();
 const start=(location.hash||"#banery").slice(1);
 if(ROOMS[start])state.room=start;
 urlToState();
+if(state.q){const qi=$("#q");if(qi){qi.value=state.q;const qc=$("#qClear");if(qc)qc.style.display="flex";}}
 render();
 </script>
 </body>
