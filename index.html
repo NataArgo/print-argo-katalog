@@ -2252,6 +2252,7 @@ function render(){
   const isBan=state.room==="banery";
   $("#side").style.display=isBan?"":"none";
   renderCats();renderCrumbs();renderSide();renderMbar();
+  {const sh=document.getElementById("sheet");if(sh&&sh.classList.contains("open")){document.getElementById("sheetBody").innerHTML=filterPanelHTML();bindPanel(document.getElementById("sheetBody"));updShow();}}
   const g=$("#grid");g.innerHTML="";
   let list=[];
   if(state.room==="banery"){
