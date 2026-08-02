@@ -265,6 +265,8 @@ body.admin .psrc{display:block}
 .fsel-clear:hover{background:rgba(0,0,0,.16)}
 .argo-toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:11px 20px;border-radius:12px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:9999;box-shadow:0 6px 24px rgba(0,0,0,.2)}
 .argo-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.shareM{border-color:var(--accent)!important;color:var(--accent)!important}
+.shareM svg{stroke:var(--accent)}
 .shlbl{font-size:12px;font-weight:700;color:var(--gray);margin:14px 0 8px;letter-spacing:.06em;text-transform:uppercase}
 .shchips{display:flex;flex-wrap:wrap;gap:7px}
 .shc{padding:8px 13px;border-radius:99px;border:1px solid var(--line);background:#fff;font-size:13.5px;font-weight:600;transition:all .12s}
@@ -2151,6 +2153,9 @@ function renderMbar(){
   activeChips().forEach(c=>mb.appendChild(c));
   const cnt=document.createElement('span');cnt.className="fcount";cnt.id="countM";
   cnt.style.marginLeft="auto";mb.appendChild(cnt);
+  const shb=document.createElement('button');shb.className="fbtn shareM";
+  shb.innerHTML=`<svg fill="none" stroke-width="2" viewBox="0 0 24 24"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg>Поділитися`;
+  shb.onclick=shareCollection;mb.appendChild(shb);
 }
 function activeChips(){
   const out=[];
@@ -2424,8 +2429,7 @@ $("#q").addEventListener("input",e=>{state.q=e.target.value.trim().toLowerCase()
 
 $("#shShow").onclick=()=>{closeSheet();render();};
 $("#shX").onclick=()=>{closeSheet();render();};
-const sb=$("#shareBtn");
-if(sb)sb.onclick=async()=>{
+async function shareCollection(){
   stateToURL();
   const link=location.href;
   try{await navigator.clipboard.writeText(link);showToast("Посилання скопійовано ✓");}
@@ -2434,7 +2438,9 @@ if(sb)sb.onclick=async()=>{
     try{document.execCommand("copy");showToast("Посилання скопійовано ✓");}catch(_){showToast("Скопіюйте вручну: "+link);}
     document.body.removeChild(t);
   }
-};
+}
+const sb=$("#shareBtn");
+if(sb)sb.onclick=shareCollection;
 function showToast(msg){
   let el=document.getElementById("argoToast");
   if(!el){el=document.createElement("div");el.id="argoToast";el.className="argo-toast";document.body.appendChild(el);}
@@ -2442,6 +2448,39 @@ function showToast(msg){
   clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),2200);
 }
 $("#shPull").onclick=()=>{closeSheet();render();};
+// змах вниз для закриття панелі фільтрів
+(function(){
+  const box=document.querySelector("#sheet .shbox");
+  if(!box)return;
+  let startY=0,curY=0,dragging=false,atTop=false;
+  box.addEventListener("touchstart",e=>{
+    if(e.touches.length!==1)return;
+    startY=e.touches[0].clientY;curY=startY;
+    atTop=box.scrollTop<=0;      // тягнемо на закриття лише якщо вміст прокручено вгору
+    dragging=true;
+  },{passive:true});
+  box.addEventListener("touchmove",e=>{
+    if(!dragging)return;
+    curY=e.touches[0].clientY;
+    const dy=curY-startY;
+    if(atTop&&dy>0){
+      box.style.transform="translateY("+dy+"px)";
+      box.style.transition="none";
+    }
+  },{passive:true});
+  box.addEventListener("touchend",()=>{
+    if(!dragging)return;
+    dragging=false;
+    const dy=curY-startY;
+    box.style.transition="transform .2s";
+    if(atTop&&dy>90){          // достатній змах вниз — закрити
+      box.style.transform="translateY(100%)";
+      setTimeout(()=>{box.style.transform="";closeSheet();render();},180);
+    }else{
+      box.style.transform="";  // недостатньо — повернути на місце
+    }
+  },{passive:true});
+})();
 $("#sideReset").onclick=()=>{resetFilters();render();};
 $("#shReset").onclick=()=>{resetFilters();buildSheet();render();};
 $("#sheet").addEventListener("click",e=>{if(e.target.id==="sheet"){closeSheet();render();}});
