@@ -2377,7 +2377,7 @@ function openProduct(p){
     ${optsHtml}
     <p class="ptotal" id="total"></p>
     <div class="pbtns">
-      <a class="pbtn order" id="orderBtn" target="_blank" rel="noopener">Замовити в Direct</a>
+      <button class="pbtn order" id="orderBtn">Замовити в Direct</button>
       <button class="pbtn alt" id="otherSize">Інший розмір чи форма — калькулятор</button>
     </div>
     <a class="psrc" target="_blank" rel="noopener" href="${DRIVE_SEARCH}${encodeURIComponent(p.id)}">Вихідник (адмін)</a>`;
@@ -2388,16 +2388,16 @@ function openProduct(p){
     if(p.kind==="shyrma"){
       const sum=qty*PRICES.shyrma;
       txt=uah(sum)+` <small>· ${qty} секц. × ${uah(PRICES.shyrma)}</small>`;
-      msg=`Вітаю! Цікавить ширма «${p.title}» (№ ${p.id}), секцій: ${qty}. Сума: ${uah(sum)}`;
+      msg=`Доброго дня! Хочу замовити:\nШирма «${p.title}» № ${p.id.toUpperCase()}, секцій: ${qty} — ${uah(sum)}\nПревью: ${location.origin}${location.pathname}?maket=${encodeURIComponent(p.id)}`;
     }else if(chosen){
       txt=uah(chosen.p)+` <small>· ${chosen.s}</small>`;
-      msg=`Вітаю! Цікавить ${title}, розмір ${chosen.s}, ціна ${uah(chosen.p)}`;
+      msg=`Доброго дня! Хочу замовити:\n${title}, розмір ${chosen.s}, обробка: люверси (стандарт) — ${uah(chosen.p)}\nПревью: ${location.origin}${location.pathname}?maket=${encodeURIComponent(p.id)}`;
     }else{
       txt=`<small>Оберіть розмір, щоб побачити ціну</small>`;
-      msg=`Вітаю! Цікавить ${title}`;
+      msg=`Доброго дня! Хочу замовити:\n${title} (уточню розмір)\nПревью: ${location.origin}${location.pathname}?maket=${encodeURIComponent(p.id)}`;
     }
     total.innerHTML=txt;
-    order.href=IG+"?text="+encodeURIComponent(msg);
+    order.dataset.msg=msg;
   }
   if(p.kind==="shyrma"){
     $("#minus").onclick=()=>{qty=Math.max(1,qty-1);$("#qty").textContent=qty+" секц.";upd();};
@@ -2407,9 +2407,26 @@ function openProduct(p){
     b.onclick=()=>{document.querySelectorAll("#opts .opt").forEach(x=>x.classList.remove("on"));b.classList.add("on");chosen={s:b.dataset.s,p:+b.dataset.p};upd();};
   });
   $("#otherSize").onclick=()=>{closeProduct();openCalc(p.id);};
+  order.onclick=()=>{
+    const msg=order.dataset.msg||"";
+    const show=()=>{document.getElementById("igModalCat").style.display="flex";};
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(msg).then(show).catch(()=>{fallbackCopy(msg);show();});
+    }else{fallbackCopy(msg);show();}
+  };
   upd();
   $("#pmodal").classList.add("open");
   document.body.style.overflow="hidden";
+}
+function fallbackCopy(t){
+  const el=document.createElement("textarea");el.value=t;el.style.position="fixed";el.style.opacity="0";
+  document.body.appendChild(el);el.select();
+  try{document.execCommand("copy");}catch(e){}
+  document.body.removeChild(el);
+}
+function igGoCat(){
+  document.getElementById("igModalCat").style.display="none";
+  window.open(IG,"_blank","noopener");
 }
 function closeProduct(){$("#pmodal").classList.remove("open");document.body.style.overflow="";}
 $("#pclose").onclick=closeProduct;
@@ -2505,5 +2522,22 @@ urlToState();
 if(state.q){const qi=$("#q");if(qi){qi.value=state.q;const qc=$("#qClear");if(qc)qc.style.display="flex";}}
 render();
 </script>
+
+<div id="igModalCat" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:100000; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:#fff; border-radius:16px; max-width:340px; width:100%; padding:26px 22px; text-align:center; box-shadow:0 12px 40px rgba(0,0,0,.3);">
+    <div style="font-size:40px; margin-bottom:8px;">✅</div>
+    <div style="font-size:17px; font-weight:700; color:#111; margin-bottom:10px;">Замовлення скопійовано!</div>
+    <div style="font-size:14px; color:#444; line-height:1.5; margin-bottom:20px;">
+      Зараз відкриється Instagram.<br>
+      У полі повідомлення <b>утримайте палець</b> і натисніть <b>«Вставити»</b> — щоб надіслати нам замовлення.
+    </div>
+    <button onclick="igGoCat()" style="width:100%; padding:14px; background:linear-gradient(90deg,#833ab4,#fd1d1d,#fcb045); color:#fff; border:none; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer;">
+      Відкрити Instagram
+    </button>
+    <button onclick="document.getElementById('igModalCat').style.display='none'" style="width:100%; margin-top:8px; padding:10px; background:none; border:none; color:#888; font-size:13px; cursor:pointer;">
+      Закрити
+    </button>
+  </div>
+</div>
 </body>
 </html>
