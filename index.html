@@ -263,6 +263,8 @@ body.admin .psrc{display:block}
 .shbox{position:relative}
 .fsel-clear{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.08);font-size:12px;margin-left:6px;color:var(--ink)}
 .fsel-clear:hover{background:rgba(0,0,0,.16)}
+.argo-toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:11px 20px;border-radius:12px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:9999;box-shadow:0 6px 24px rgba(0,0,0,.2)}
+.argo-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .shlbl{font-size:12px;font-weight:700;color:var(--gray);margin:14px 0 8px;letter-spacing:.06em;text-transform:uppercase}
 .shchips{display:flex;flex-wrap:wrap;gap:7px}
 .shc{padding:8px 13px;border-radius:99px;border:1px solid var(--line);background:#fff;font-size:13.5px;font-weight:600;transition:all .12s}
@@ -345,7 +347,8 @@ body.admin .v::after{content:" · адмін";color:#C2452D;font-weight:700}
       <svg fill="none" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input id="q" type="search" placeholder="Пошук" autocomplete="off">
     </div>
-    <button class="calcbtn" id="openCalc">Калькулятор</button>
+    <button class="calcbtn" id="shareBtn" title="Скопіювати посилання на цю добірку">Поділитися</button>
+      <button class="calcbtn" id="openCalc">Калькулятор</button>
     <button class="burger" id="burger" aria-label="Меню"><svg fill="none" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
   </div>
   <div class="mega" id="mega"><div class="mega-in" id="megaIn"></div></div>
@@ -2164,6 +2167,31 @@ function activeChips(){
   return out;
 }
 
+// ── синхронізація фільтрів з адресою (поділитися колекцією) ──
+function stateToURL(){
+  const p=new URLSearchParams();
+  if(state.room&&state.room!=="banery")p.set("room",state.room);
+  if(state.cat)p.set("cat",state.cat);
+  if(state.event)p.set("event",state.event);
+  if(state.tag)p.set("tag",state.tag);
+  if(state.age!=null)p.set("age",state.age);
+  if(state.who)p.set("who",state.who);
+  if(state.colors&&state.colors.length)p.set("colors",state.colors.join(","));
+  if(state.q)p.set("q",state.q);
+  const qs=p.toString();
+  history.replaceState(null,"",location.pathname+(qs?"?"+qs:""));
+}
+function urlToState(){
+  const p=new URLSearchParams(location.search);
+  if(p.has("room")&&ROOMS[p.get("room")])state.room=p.get("room");
+  if(p.has("cat"))state.cat=p.get("cat");
+  if(p.has("event"))state.event=p.get("event");
+  if(p.has("tag"))state.tag=p.get("tag");
+  if(p.has("age"))state.age=+p.get("age");
+  if(p.has("who"))state.who=p.get("who");
+  if(p.has("colors"))state.colors=p.get("colors").split(",").filter(Boolean);
+  if(p.has("q"))state.q=p.get("q");
+}
 function resetFilters(){
   state.event=null;state.tag=null;state.age=null;state.who=null;state.colors=[];state.q="";
 }
@@ -2271,6 +2299,7 @@ function render(){
   $("#side").style.display=isBan?"":"none";
   renderCats();renderCrumbs();renderSide();renderMbar();
   {const sh=document.getElementById("sheet");if(sh&&sh.classList.contains("open")){document.getElementById("sheetBody").innerHTML=filterPanelHTML();bindPanel(document.getElementById("sheetBody"));updShow();}}
+  stateToURL();
   const g=$("#grid");g.innerHTML="";
   let list=[];
   if(state.room==="banery"){
@@ -2395,6 +2424,23 @@ $("#q").addEventListener("input",e=>{state.q=e.target.value.trim().toLowerCase()
 
 $("#shShow").onclick=()=>{closeSheet();render();};
 $("#shX").onclick=()=>{closeSheet();render();};
+const sb=$("#shareBtn");
+if(sb)sb.onclick=async()=>{
+  stateToURL();
+  const link=location.href;
+  try{await navigator.clipboard.writeText(link);showToast("Посилання скопійовано ✓");}
+  catch(e){
+    const t=document.createElement("textarea");t.value=link;document.body.appendChild(t);t.select();
+    try{document.execCommand("copy");showToast("Посилання скопійовано ✓");}catch(_){showToast("Скопіюйте вручну: "+link);}
+    document.body.removeChild(t);
+  }
+};
+function showToast(msg){
+  let el=document.getElementById("argoToast");
+  if(!el){el=document.createElement("div");el.id="argoToast";el.className="argo-toast";document.body.appendChild(el);}
+  el.textContent=msg;el.classList.add("show");
+  clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),2200);
+}
 $("#shPull").onclick=()=>{closeSheet();render();};
 $("#sideReset").onclick=()=>{resetFilters();render();};
 $("#shReset").onclick=()=>{resetFilters();buildSheet();render();};
@@ -2402,6 +2448,7 @@ $("#sheet").addEventListener("click",e=>{if(e.target.id==="sheet"){closeSheet();
 buildMega();buildDrawer();
 const start=(location.hash||"#banery").slice(1);
 if(ROOMS[start])state.room=start;
+urlToState();
 render();
 </script>
 </body>
