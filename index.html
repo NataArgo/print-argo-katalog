@@ -257,6 +257,12 @@ body.admin .psrc{display:block}
 .shbox{background:#fff;width:100%;max-width:560px;max-height:88vh;overflow:auto;border-radius:20px 20px 0 0;padding:10px 18px 18px}
 @media(min-width:680px){.shbox{border-radius:20px}}
 .shpull{width:38px;height:4px;border-radius:2px;background:var(--line);margin:6px auto 14px}
+.shpull{cursor:pointer;padding:8px 0;width:60px;height:auto;margin:0 auto 8px}
+.shpull::before{content:"";display:block;width:38px;height:4px;border-radius:2px;background:var(--line);margin:0 auto}
+.shx{position:absolute;top:10px;right:14px;width:34px;height:34px;border:none;background:var(--tint);border-radius:50%;font-size:16px;color:var(--ink);cursor:pointer;line-height:1;z-index:2}
+.shbox{position:relative}
+.fsel-clear{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.08);font-size:12px;margin-left:6px;color:var(--ink)}
+.fsel-clear:hover{background:rgba(0,0,0,.16)}
 .shlbl{font-size:12px;font-weight:700;color:var(--gray);margin:14px 0 8px;letter-spacing:.06em;text-transform:uppercase}
 .shchips{display:flex;flex-wrap:wrap;gap:7px}
 .shc{padding:8px 13px;border-radius:99px;border:1px solid var(--line);background:#fff;font-size:13.5px;font-weight:600;transition:all .12s}
@@ -388,7 +394,8 @@ body.admin .v::after{content:" · адмін";color:#C2452D;font-weight:700}
 
 <div class="sheet" id="sheet">
   <div class="shbox">
-    <div class="shpull"></div>
+    <div class="shpull" id="shPull"></div>
+    <button class="shx" id="shX" aria-label="Закрити">✕</button>
     <div id="sheetBody"></div>
     <div class="shfoot">
       <button class="shshow" id="shShow">Показати</button>
@@ -1936,7 +1943,7 @@ function dropdown(id,label,icon,curVal,options,onEmpty){
   return `<div class="fblock"><p class="fblk-h">${icon?`<span class="ic">${icon}</span>`:""}${label}</p>
     <div class="fsel" id="${id}Sel">
       <button class="fsel-btn${curVal?" has":""}" data-sel="${id}">${btnLabel}
-        <svg fill="none" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+        ${curVal?`<span class="fsel-clear" data-clear="${id}" role="button" aria-label="Скинути">✕</span>`:""}<svg fill="none" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
       <div class="fsel-menu" data-menu="${id}">
         ${options.length>8?`<input class="fsel-search" data-search="${id}" placeholder="пошук…">`:""}
         ${opts}
@@ -2024,9 +2031,20 @@ function bindPanel(root){
       render();};
   });
   // спадаючі меню
+  // ✕ біля обраного значення — скинути саме цей фільтр
+  root.querySelectorAll(".fsel-clear[data-clear]").forEach(x=>{
+    x.onclick=e=>{
+      e.stopPropagation();
+      const id=x.dataset.clear;
+      if(id==="age"){state.age=null;}
+      else{state.tag=null;}
+      render();
+    };
+  });
   root.querySelectorAll(".fsel-btn[data-sel]").forEach(btn=>{
     const id=btn.dataset.sel, sel=btn.closest(".fsel");
     btn.onclick=e=>{
+      if(e.target.closest(".fsel-clear"))return;
       e.stopPropagation();
       const wasOpen=sel.classList.contains("open");
       document.querySelectorAll(".fsel.open").forEach(x=>x.classList.remove("open"));
@@ -2376,6 +2394,8 @@ $("#logo").addEventListener("click",e=>{
 $("#q").addEventListener("input",e=>{state.q=e.target.value.trim().toLowerCase();render();});
 
 $("#shShow").onclick=()=>{closeSheet();render();};
+$("#shX").onclick=()=>{closeSheet();render();};
+$("#shPull").onclick=()=>{closeSheet();render();};
 $("#sideReset").onclick=()=>{resetFilters();render();};
 $("#shReset").onclick=()=>{resetFilters();buildSheet();render();};
 $("#sheet").addEventListener("click",e=>{if(e.target.id==="sheet"){closeSheet();render();}});
