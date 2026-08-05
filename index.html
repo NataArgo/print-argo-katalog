@@ -2314,6 +2314,7 @@ function render(){
   $("#pLead").textContent=R.lead;
   const isBan=state.room==="banery";
   $("#side").style.display=isBan?"":"none";
+  const contentEl=document.querySelector(".content");if(contentEl)contentEl.style.gridColumn=isBan?"":"1 / -1";
   renderCats();renderCrumbs();renderSide();renderMbar();
   {const sh=document.getElementById("sheet");if(sh&&sh.classList.contains("open")){document.getElementById("sheetBody").innerHTML=filterPanelHTML();bindPanel(document.getElementById("sheetBody"));updShow();}}
   stateToURL();
