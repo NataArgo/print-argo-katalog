@@ -202,8 +202,14 @@ h1{font-weight:600;font-size:clamp(23px,3.4vw,32px);letter-spacing:-.02em;line-h
 @media(min-width:680px){.pmodal{align-items:center;padding:20px}}
 .pbox{background:#fff;width:100%;max-width:880px;max-height:94vh;overflow:auto;border-radius:20px 20px 0 0;position:relative}
 @media(min-width:680px){.pbox{border-radius:20px;display:grid;grid-template-columns:1.05fr 1fr}}
-.pimg{background:var(--tint);display:flex;align-items:center;justify-content:center;min-height:280px}
+.pimg{position:relative;background:var(--tint);display:flex;align-items:center;justify-content:center;min-height:280px}
 .pimg img{max-height:min(70vh,560px);object-fit:contain}
+.pnav{position:absolute;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.18);font-size:19px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;color:var(--ink)}
+.pnav.prev{left:12px}.pnav.next{right:12px}
+.pnav.hide{display:none}
+.pdots{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:2}
+.pdot{width:7px;height:7px;border-radius:50%;background:rgba(0,0,0,.22)}
+.pdot.on{background:var(--ink)}
 .pinfo{padding:22px 22px 26px;display:flex;flex-direction:column;gap:14px}
 .pclose{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.16);font-size:16px;display:flex;align-items:center;justify-content:center;z-index:3}
 .pinfo .art{font-size:12px}
@@ -423,7 +429,12 @@ body.admin .v::after{content:" · адмін";color:#C2452D;font-weight:700}
 <div class="pmodal" id="pmodal">
   <div class="pbox">
     <button class="pclose" id="pclose">✕</button>
-    <div class="pimg"><img id="pmImg" alt=""></div>
+    <div class="pimg">
+      <button class="pnav prev hide" id="pmPrev" aria-label="Попереднє фото">‹</button>
+      <img id="pmImg" alt="">
+      <button class="pnav next hide" id="pmNext" aria-label="Наступне фото">›</button>
+      <div class="pdots" id="pmDots"></div>
+    </div>
     <div class="pinfo" id="pmInfo"></div>
   </div>
 </div>
@@ -1780,7 +1791,7 @@ const EVENT_GROUPS={
 const ROOMS={
   banery:{title:"Друк банерів для фотозон",lead:"Оберіть макет — надрукуємо у вашому розмірі та додамо будь-який напис безкоштовно. Друк 1–3 дні.",season:""},
   fotofony:{title:"Фотофони",lead:"Матовий литий банер 440 г/м² — без бліків від спалаху. Для фотостудій, свят і предметної зйомки.",season:'Розділ · <b>Фотофони</b>'},
-  kutovi:{title:"Кутові фотофони",lead:"Стіна + підлога під кутом — готова міні-студія для предметної зйомки. Друк еко-чорнилами, 1440 dpi.",season:'Розділ · <b>Кутові фотофони</b>'},
+  kutovi:{title:"Кутові фотофони",lead:"Стіна + підлога під кутом — готова міні-студія для предметної зйомки.",season:'Розділ · <b>Кутові фотофони</b>'},
   shyrmy:{title:"Декоративні ширми",lead:"Каркас з натурального дерева + банерне полотно. Секція 40×180 см — комбінуйте будь-яку кількість.",season:'Розділ · <b>Ширми</b>'},
   karkasy:{title:"Каркаси та стійки",lead:"Металеві розбірні каркаси під банер. Стандартні розміри зі складу або будь-який розмір під замовлення.",season:'Розділ · <b>Каркаси</b>'}
 };
@@ -2342,8 +2353,20 @@ function render(){
 }
 
 /* ───── Модал товару ───── */
+const MONTAGE_KUTOVI=["img/montaz_kutovi_1.jpg","img/montaz_kutovi_2.jpg","img/montaz_kutovi_3.jpg"];
 function openProduct(p){
-  $("#pmImg").src=p.img;
+  const slides=p.kind==="kutovi"?[p.img,...MONTAGE_KUTOVI]:[p.img];
+  let slideIdx=0;
+  function showSlide(i){
+    slideIdx=(i+slides.length)%slides.length;
+    $("#pmImg").src=slides[slideIdx];
+    $("#pmPrev").classList.toggle("hide",slides.length<2);
+    $("#pmNext").classList.toggle("hide",slides.length<2);
+    $("#pmDots").innerHTML=slides.length<2?"":slides.map((_,i)=>`<span class="pdot${i===slideIdx?" on":""}"></span>`).join("");
+  }
+  showSlide(0);
+  $("#pmPrev").onclick=()=>showSlide(slideIdx-1);
+  $("#pmNext").onclick=()=>showSlide(slideIdx+1);
   const info=$("#pmInfo");
   let sizeOpts="",chosen=null,qty=1;
   const title=p.kind==="banner"?`Макет № ${p.id.toUpperCase()}${p.age?" · "+p.age:""}`:(p.kind==="karkas"?`Металевий каркас ${p.size}`:p.title);
