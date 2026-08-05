@@ -97,8 +97,8 @@ h1{font-weight:600;font-size:clamp(23px,3.4vw,32px);letter-spacing:-.02em;line-h
 
 /* ── Сітка ── */
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px 14px;padding:20px 0 60px}
-@media(min-width:680px){.grid{grid-template-columns:repeat(3,1fr);gap:32px 20px}}
-@media(min-width:1020px){.grid{grid-template-columns:repeat(3,1fr);gap:36px 24px}}
+@media(min-width:680px){.grid{grid-template-columns:repeat(3,1fr);gap:32px 20px}.grid.g4{grid-template-columns:repeat(4,1fr);gap:26px 16px}}
+@media(min-width:1020px){.grid{grid-template-columns:repeat(3,1fr);gap:36px 24px}.grid.g4{grid-template-columns:repeat(4,1fr);gap:28px 18px}}
 
 /* ── layout: sidebar + content ── */
 .layout{display:block}
@@ -2299,7 +2299,7 @@ function cardSimple(d,kind,fromPrice,cover){
 function cardKarkas(d){
   const el=document.createElement('article');el.className="card";
   const pr=PRICES.karkas.find(([s])=>s===d.size);
-  el.innerHTML=`<div class="ph cover"><img src="${d.img}" alt="Каркас ${d.size}" loading="lazy" referrerpolicy="no-referrer"></div>
+  el.innerHTML=`<div class="ph"><img src="${d.img}" alt="Каркас ${d.size}" loading="lazy" referrerpolicy="no-referrer"></div>
     <p class="ctitle">Каркас ${d.size}</p>
     <div class="crow"><span class="art">метал, розбірний</span><span class="price">${pr?uah(pr[1]):""}</span></div>`;
   el.onclick=()=>openProduct({kind:"karkas",...d});
@@ -2315,6 +2315,7 @@ function render(){
   const isBan=state.room==="banery";
   $("#side").style.display=isBan?"":"none";
   const contentEl=document.querySelector(".content");if(contentEl)contentEl.style.gridColumn=isBan?"":"1 / -1";
+  const gridEl=$("#grid");if(gridEl)gridEl.classList.toggle("g4",!isBan);
   renderCats();renderCrumbs();renderSide();renderMbar();
   {const sh=document.getElementById("sheet");if(sh&&sh.classList.contains("open")){document.getElementById("sheetBody").innerHTML=filterPanelHTML();bindPanel(document.getElementById("sheetBody"));updShow();}}
   stateToURL();
@@ -2325,9 +2326,9 @@ function render(){
     list.forEach(d=>g.appendChild(cardBanner(d)));
     if(!list.length&&state.event)g.innerHTML=`<div class="empty"><b>Колекція «${state.event}» скоро</b>Ми додаємо макети поступово. Напишіть нам — підберемо або створимо дизайн під вашу подію.</div>`;
   }
-  if(state.room==="fotofony"){list=D.fotofony.filter(hitQ);list.forEach(d=>g.appendChild(cardSimple(d,"fotofon","від "+uah(PRICES.banner[0][1]),true)));}
-  if(state.room==="kutovi"){list=D.kutovi.filter(hitQ);list.forEach(d=>g.appendChild(cardSimple(d,"kutovi","від "+uah(PRICES.kutovi[0][1]),true)));}
-  if(state.room==="shyrmy"){list=D.shyrmy.filter(hitQ);list.forEach(d=>g.appendChild(cardSimple(d,"shyrma",uah(PRICES.shyrma)+" / секція",true)));}
+  if(state.room==="fotofony"){list=D.fotofony.filter(hitQ);list.forEach(d=>g.appendChild(cardSimple(d,"fotofon","від "+uah(PRICES.banner[0][1]),false)));}
+  if(state.room==="kutovi"){list=D.kutovi.filter(hitQ);list.forEach(d=>g.appendChild(cardSimple(d,"kutovi","від "+uah(PRICES.kutovi[0][1]),false)));}
+  if(state.room==="shyrmy"){list=D.shyrmy.filter(hitQ);list.forEach(d=>g.appendChild(cardSimple(d,"shyrma",uah(PRICES.shyrma)+" / секція",false)));}
   if(state.room==="karkasy"){list=D.karkasy;list.forEach(d=>g.appendChild(cardKarkas(d)));
     const c=document.createElement('article');c.className="card";
     c.innerHTML=`<div class="ph" style="display:flex;align-items:center;justify-content:center"><div style="text-align:center;color:var(--gray);padding:20px"><div style="font-size:34px;margin-bottom:8px">📐</div>Потрібен інший розмір?<br>Порахуйте в калькуляторі</div></div><p class="ctitle">Каркас під ваш розмір</p><div class="crow"><span class="art">будь-які розміри</span></div>`;
