@@ -3,8 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>print.АРГО — все для фотозони: банери, фотофони, каркаси, ширми</title>
-<meta name="description" content="Все для фотозони: макети банерів, фотофони, кутові фотофони, металеві каркаси та декоративні ширми. Друк 1–3 дні, доставка по Україні.">
+<title>print.АРГО — друк банерів для фотозон: фотофони, каркаси, ширми</title>
+<meta name="description" content="Друк банерів для фотозон: макети банерів, фотофони, кутові фотофони, металеві каркаси та декоративні ширми. Доставка по Україні.">
+<link rel="canonical" href="https://print-argo.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="print.АРГО">
+<meta property="og:title" content="print.АРГО — друк банерів для фотозон">
+<meta property="og:description" content="Понад 1300 макетів банерів для фотозон: дні народження, весілля, випускні та інше. Друк під ваш розмір, доставка по Україні.">
+<meta property="og:image" content="https://print-argo.com/img/og_image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://print-argo.com/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="print.АРГО — друк банерів для фотозон">
+<meta name="twitter:description" content="Понад 1300 макетів банерів для фотозон. Друк під ваш розмір, доставка по Україні.">
+<meta name="twitter:image" content="https://print-argo.com/img/og_image.jpg">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="img/favicon_32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="img/favicon_192.png">
@@ -38,6 +51,11 @@ nav.main>div{height:100%;display:flex}
 .nl:hover{color:var(--ink)}
 .nl.act{color:var(--ink);border-color:var(--ink)}
 .nl svg{width:11px;height:11px;stroke:currentColor}
+.nlgroup{display:flex;align-items:center}
+.nlgroup .nl{padding-right:4px}
+.nlchev{display:flex;align-items:center;justify-content:center;height:100%;padding:0 13px 0 3px;border:none;background:transparent;cursor:pointer;color:#3d3d3d;border-bottom:2px solid transparent;transition:color .15s}
+.nlchev:hover{color:var(--ink)}
+.nlchev svg{width:11px;height:11px;stroke:currentColor}
 .hspace{flex:1}
 .search{position:relative;width:min(260px,40vw)}
 .search input{width:100%;height:37px;border:1px solid var(--line);border-radius:99px;padding:0 14px 0 34px;font-size:14px;background:var(--tint);outline:none;transition:all .2s}
@@ -350,9 +368,9 @@ body.admin .v::after{content:" · адмін";color:#C2452D;font-weight:700}
 
 <header>
   <div class="wrap bar">
-    <a class="logo" href="#banery" id="logo"><b>PRINT<i>.</i>АРГО</b><span>все для фотозони</span></a>
+    <a class="logo" href="#banery" id="logo"><b>PRINT<i>.</i>АРГО</b><span>Друк банерів для фотозон</span></a>
     <nav class="main" id="nav">
-      <div><button class="nl" data-room="banery" id="navBanery">Банери <svg fill="none" stroke-width="2.4" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button></div>
+      <div class="nlgroup"><button class="nl" data-room="banery" id="navBanery">Банери</button><button class="nlchev" id="navBaneryChev" aria-label="Категорії банерів" aria-haspopup="true"><svg fill="none" stroke-width="2.4" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button></div>
       <div><button class="nl" data-room="fotofony">Фотофони</button></div>
       <div><button class="nl" data-room="kutovi">Кутові фотофони</button></div>
       <div><button class="nl" data-room="shyrmy">Ширми</button></div>
@@ -424,7 +442,7 @@ body.admin .v::after{content:" · адмін";color:#C2452D;font-weight:700}
 </div>
 <footer>
   <div class="wrap foot">
-    <span>print.АРГО — виробничо-рекламна агенція, м. Хмельницький · Друк 1–3 дні · Доставка Новою поштою по Україні</span>
+    <span>print.АРГО — виробничо-рекламна агенція, м. Хмельницький · Доставка Новою поштою по Україні</span>
     <span><a href="#" id="footCalc">Калькулятор</a> &nbsp; <a href="https://www.instagram.com/print.argo" target="_blank" rel="noopener">Instagram</a> &nbsp; <a href="https://print-argo.prom.ua/ua/" target="_blank" rel="noopener">Prom.ua</a></span>
   </div>
 </footer>
@@ -450,8 +468,6 @@ body.admin .v::after{content:" · адмін";color:#C2452D;font-weight:700}
     <iframe id="calcFrame" title="Калькулятор вартості" loading="lazy"></iframe>
   </div>
 </div>
-
-<span class="v">прототип · v6</span>
 
 <script>
 const SIZE_SUFFIX={"S":"1,5\u00d72","\u0405":"1,5\u00d72","k":"\u043a\u0440\u0443\u0433\u043b\u0438\u0439","\u043a":"\u043a\u0440\u0443\u0433\u043b\u0438\u0439","M":"2\u00d72,5","\u041c":"2\u00d72,5","L":"2\u00d73","\u041b":"2\u00d73","R":"\u043a\u0440\u0443\u0433\u043b\u0438\u0439","\u0420":"\u043a\u0440\u0443\u0433\u043b\u0438\u0439"};
@@ -1793,7 +1809,7 @@ const EVENT_GROUPS={
 };
 
 const ROOMS={
-  banery:{title:"Друк банерів для фотозон",lead:"Оберіть макет — надрукуємо у вашому розмірі та додамо будь-який напис безкоштовно. Друк 1–3 дні.",season:""},
+  banery:{title:"Друк банерів для фотозон",lead:"Оберіть макет — надрукуємо у вашому розмірі та додамо будь-який напис безкоштовно.",season:""},
   fotofony:{title:"Фотофони",lead:"Матовий литий банер 440 г/м² — без бліків від спалаху. Для фотостудій, свят і предметної зйомки.",season:'Розділ · <b>Фотофони</b>'},
   kutovi:{title:"Кутові фотофони",lead:"Стіна + підлога під кутом — готова міні-студія для предметної зйомки.",season:'Розділ · <b>Кутові фотофони</b>'},
   shyrmy:{title:"Декоративні ширми",lead:"Каркас з натурального дерева + банерне полотно. Секція 40×180 см — комбінуйте будь-яку кількість.",season:'Розділ · <b>Ширми</b>'},
@@ -1831,13 +1847,13 @@ function go(room,ev){
 }
 document.querySelectorAll(".nl").forEach(b=>{
   b.onclick=e=>{
-    if(b.id==="navBanery"){e.stopPropagation();toggleMega();return;}
     go(b.dataset.room);
   };
 });
+$("#navBaneryChev").onclick=e=>{e.stopPropagation();toggleMega();};
 function toggleMega(){$("#mega").classList.toggle("open");}
 function closeMega(){$("#mega").classList.remove("open");}
-document.addEventListener("click",e=>{if(!e.target.closest("#mega")&&!e.target.closest("#navBanery"))closeMega();});
+document.addEventListener("click",e=>{if(!e.target.closest("#mega")&&!e.target.closest("#navBaneryChev"))closeMega();});
 
 function buildMega(){
   const c=$("#megaIn");c.innerHTML="";
@@ -2287,12 +2303,25 @@ function expandQuery(q){
   });
   return [...out];
 }
+// перевірка, що знайдений збіг — ціле слово, а не частина іншого слова
+function wordIncludes(hay,needle){
+  if(!needle)return false;
+  const isLetter=ch=>ch&&/[a-zа-яіїєґ0-9']/i.test(ch);
+  let idx=0;
+  while((idx=hay.indexOf(needle,idx))!==-1){
+    const before=hay[idx-1];
+    const after=hay[idx+needle.length];
+    if(!isLetter(before)&&!isLetter(after))return true;
+    idx+=1;
+  }
+  return false;
+}
 function hitQ(d){
   if(!state.q)return true;
   const hay=((d.title||"")+" "+d.id+" "+(d.themes||[]).join(" ")+" "+(d.heroes||[]).join(" ")+" "+(d.who||[]).join(" ")+" "+(d.events||[]).join(" ")).toLowerCase();
   if(hay.includes(state.q))return true;
-  // пошук за синонімами (укр/англ/побутові написання)
-  return expandQuery(state.q).some(v=>hay.includes(v));
+  // пошук за синонімами (укр/англ/побутові написання) — тільки як ціле слово
+  return expandQuery(state.q).some(v=>wordIncludes(hay,v));
 }
 
 /* ───── Картки ───── */
@@ -2483,8 +2512,14 @@ $("#logo").addEventListener("click",e=>{
   }
 });
 
-$("#q").addEventListener("input",e=>{state.q=e.target.value.trim().toLowerCase();const qc=$("#qClear");if(qc)qc.style.display=e.target.value?"flex":"none";render();});
-$("#qClear").onclick=()=>{const inp=$("#q");inp.value="";state.q="";$("#qClear").style.display="none";inp.focus();render();};
+let qDebounce=null;
+$("#q").addEventListener("input",e=>{
+  const val=e.target.value;
+  const qc=$("#qClear");if(qc)qc.style.display=val?"flex":"none";
+  clearTimeout(qDebounce);
+  qDebounce=setTimeout(()=>{state.q=val.trim().toLowerCase();render();},220);
+});
+$("#qClear").onclick=()=>{clearTimeout(qDebounce);const inp=$("#q");inp.value="";state.q="";$("#qClear").style.display="none";inp.focus();render();};
 
 $("#shShow").onclick=()=>{closeSheet();render();};
 $("#shX").onclick=()=>{closeSheet();render();};
