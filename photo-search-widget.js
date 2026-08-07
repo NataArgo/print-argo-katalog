@@ -182,7 +182,7 @@
       '<div class="ps-modal">' +
       '  <button class="ps-close" aria-label="Закрити">✕</button>' +
       '  <p class="ps-title">Пошук схожого макета за фото</p>' +
-      '  <p class="ps-sub">Завантаж фото-референс. Якщо на фото багато зайвого фону — обріж, лишивши тільки сам дизайн.</p>' +
+      '  <p class="ps-sub">Завантаж фото-референс.<br>Обріж фото, лишивши тільки сам дизайн.<br>Шукаємо серед готових макетів нашого каталогу.</p>' +
       '  <div class="ps-body"></div>' +
       '</div>';
     document.body.appendChild(overlay);
