@@ -135,7 +135,7 @@
       .ps-status.err { color: #c0392b; }
 
       .ps-results { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
-      .ps-card { border-radius: 10px; overflow: hidden; border: 1px solid var(--line); text-decoration: none; color: inherit; transition: box-shadow .15s; }
+      .ps-card { border-radius: 10px; overflow: hidden; border: 1px solid var(--line); text-decoration: none; color: inherit; transition: box-shadow .15s; background: none; padding: 0; text-align: left; display: block; width: 100%; font: inherit; cursor: pointer; }
       .ps-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,.12); }
       .ps-card img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; background: var(--tint); }
       .ps-card .ps-card-body { padding: 6px 8px; }
@@ -387,15 +387,21 @@
       const title = item ? item.title : '';
       const pct = Math.round(entry.score * 100);
 
-      const a = document.createElement('a');
+      const a = document.createElement('button');
+      a.type = 'button';
       a.className = 'ps-card';
-      a.href = '#banery-' + entry.id;
       a.innerHTML =
         '<img src="' + imgSrc + '" alt="' + entry.id + '" loading="lazy">' +
         '<div class="ps-card-body">' +
         '  <p class="ps-id">' + entry.id + (title ? ' — ' + title : '') + '</p>' +
         '  <p class="ps-pct">' + pct + '% схожості</p>' +
         '</div>';
+      a.addEventListener('click', function () {
+        closeModal(); // закриваємо вікно пошуку, щоб не було "модалка на модалці"
+        if (item && typeof openProduct === 'function') {
+          openProduct(Object.assign({ kind: 'banner' }, item));
+        }
+      });
       grid.appendChild(a);
     });
 
