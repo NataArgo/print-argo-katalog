@@ -1,48 +1,28 @@
 /* photo-search-widget.js
  * ------------------------------------------------------------
- * Що робить цей файл:
- * Додає на сторінку кнопку "Знайти схожий макет за фото".
- * Користувач завантажує фото, обрізає зайве, і бачить найсхожіші
- * банери з каталогу.
+ * Додає в наявне поле пошуку сайту (той самий інпут з лупою)
+ * маленьку іконку фотоапарата — за принципом Google Lens у Google-пошуку.
+ * Наведення — підказка. Клік — відкриває пошук за фото.
  *
- * ЯК ПІДКЛЮЧИТИ (2 кроки):
- * 1. У тому місці HTML, де має бути кнопка входу в пошук
- *    (наприклад, над сіткою банерів), встав:
- *      <div id="photo-search-entry"></div>
- *
- *    Якщо хочеш ще й пункт у меню "Інструменти" — встав такий самий
- *    div ще раз там, з ІНШИМ id, наприклад:
- *      <div id="photo-search-entry-menu"></div>
- *    і нижче в налаштуваннях (розділ CONFIG) додай його в ENTRY_SELECTORS.
- *
- * 2. Перед закриваючим </body> встав:
- *      <script src="photo-search-widget.js"></script>
- *    ОБОВ'ЯЗКОВО після того місця, де на сторінці визначається `const D`
- *    (це там, де вся база каталогу) — віджет використовує її напряму,
- *    щоб не завантажувати каталог ще раз.
+ * ЯК ПІДКЛЮЧИТИ:
+ * Просто встав перед </body>, ПІСЛЯ основного inline-скрипта сторінки
+ * (там, де визначається const D):
+ *   <script src="photo-search-widget.js"></script>
+ * Жодних додаткових <div> у розмітку вставляти не треба — віджет сам
+ * знаходить існуюче поле пошуку (#q) і добудовує іконку в нього.
  * ------------------------------------------------------------ */
 
 (function () {
   'use strict';
 
-  // ============== НАЛАШТУВАННЯ ==============
   const CONFIG = {
-    // Куди йде фото для розрахунку "відбитку" (наша Netlify Function).
     EMBED_ENDPOINT: 'https://print-argo-search.netlify.app/.netlify/functions/embed',
-    // Де лежить файл з готовими відбитками каталогу (той самий репозиторій).
     EMBEDDINGS_URL: 'embeddings.json',
-    // Скільки схожих банерів показувати.
     TOP_N: 12,
-    // У які елементи на сторінці вставити кнопку входу.
-    ENTRY_SELECTORS: ['#photo-search-entry', '#photo-search-entry-menu'],
-    // Максимальний розмір фото, яке відправляємо (довша сторона, px) —
-    // менше фото = швидше і дешевше, якість пошуку від цього не страждає.
     MAX_UPLOAD_SIDE: 1024,
   };
 
-  let embeddingsCache = null; // { id: [768 чисел], ... }
-
-  // ============== ДОПОМІЖНІ ФУНКЦІЇ ==============
+  let embeddingsCache = null;
 
   function cosineSimilarity(a, b) {
     let dot = 0, na = 0, nb = 0;
@@ -62,118 +42,131 @@
     return embeddingsCache;
   }
 
-  // Знаходить дані банера (шлях до фото, назву) у вже наявній на сторінці
-  // базі каталогу `D`, яка визначена в основному скрипті сторінки.
   function findCatalogItem(id) {
     if (typeof D === 'undefined' || !D.banery) return null;
     return D.banery.find(function (it) { return it.id === id; }) || null;
   }
 
-  // ============== СТИЛІ ==============
-
   function injectStyles() {
     const css = `
-      .ps-entry-btn {
-        display: flex; align-items: center; gap: 12px;
-        background: #f4f7ee; border: 1.5px solid #5E9A1E; border-radius: 14px;
-        padding: 16px 20px; cursor: pointer; width: 100%; max-width: 480px;
-        font-family: inherit; text-align: left; margin: 16px 0;
+      .ps-lens-btn {
+        position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+        width: 26px; height: 26px; border-radius: 50%; border: none;
+        background: transparent; display: flex; align-items: center; justify-content: center;
+        cursor: pointer; transition: background .15s;
       }
-      .ps-entry-btn:hover { background: #EAF3DE; }
-      .ps-entry-icon { font-size: 26px; line-height: 1; }
-      .ps-entry-text b { display: block; font-size: 15px; color: #1a1a1a; }
-      .ps-entry-text span { font-size: 13px; color: #6b6b68; }
+      .ps-lens-btn:hover { background: var(--tint); }
+      .ps-lens-btn svg { width: 17px; height: 17px; stroke: var(--gray); }
+      .ps-lens-btn:hover svg { stroke: var(--ink); }
+      .search input { padding-right: 38px; }
+      .qclear { right: 36px !important; }
+
+      .ps-tooltip {
+        position: absolute; bottom: calc(100% + 8px); right: 0;
+        background: var(--ink); color: #fff; font-size: 12px; font-weight: 500;
+        padding: 6px 10px; border-radius: 8px; white-space: nowrap;
+        opacity: 0; pointer-events: none; transform: translateY(3px);
+        transition: opacity .15s, transform .15s; z-index: 5;
+      }
+      .ps-tooltip::after {
+        content: ''; position: absolute; top: 100%; right: 10px;
+        border: 5px solid transparent; border-top-color: var(--ink);
+      }
+      .ps-lens-btn:hover .ps-tooltip { opacity: 1; transform: translateY(0); }
 
       .ps-overlay {
-        position: fixed; inset: 0; background: rgba(0,0,0,0.55);
-        display: flex; align-items: center; justify-content: center;
-        z-index: 9999; padding: 20px;
+        position: fixed; inset: 0; background: rgba(20,20,20,0.5);
+        display: flex; align-items: flex-start; justify-content: center;
+        z-index: 9999; padding: 6vh 20px; overflow-y: auto;
       }
       .ps-modal {
-        background: #fff; border-radius: 16px; max-width: 640px; width: 100%;
-        max-height: 88vh; overflow-y: auto; padding: 24px; position: relative;
-        font-family: inherit; color: #1a1a1a;
+        background: var(--bg); border-radius: 20px; max-width: 600px; width: 100%;
+        padding: 28px; position: relative; font-family: inherit; color: var(--ink);
+        box-shadow: 0 20px 60px rgba(0,0,0,.25);
       }
       .ps-close {
-        position: absolute; top: 16px; right: 16px; width: 32px; height: 32px;
-        border-radius: 50%; border: none; background: #f0f0f0; cursor: pointer;
-        font-size: 16px; line-height: 1;
+        position: absolute; top: 18px; right: 18px; width: 30px; height: 30px;
+        border-radius: 50%; border: none; background: var(--tint); cursor: pointer;
+        font-size: 15px; line-height: 1; color: var(--ink);
       }
-      .ps-title { font-size: 19px; font-weight: 700; margin: 0 0 6px; }
-      .ps-sub { font-size: 13.5px; color: #6b6b68; margin: 0 0 20px; }
+      .ps-close:hover { background: var(--line); }
+      .ps-title { font-size: 18px; font-weight: 700; margin: 0 0 6px; padding-right: 30px; }
+      .ps-sub { font-size: 13.5px; color: var(--gray); margin: 0 0 22px; line-height: 1.5; }
 
       .ps-dropzone {
-        border: 1.5px dashed #ccc; border-radius: 12px; padding: 30px 16px;
-        text-align: center; cursor: pointer; margin-bottom: 16px;
+        border: 1.5px dashed var(--line); border-radius: 14px; padding: 36px 16px;
+        text-align: center; cursor: pointer; margin-bottom: 4px; transition: border-color .15s, background .15s;
       }
-      .ps-dropzone:hover { border-color: #5E9A1E; }
+      .ps-dropzone:hover { border-color: var(--accent); background: var(--tint); }
 
-      .ps-crop-wrap { position: relative; margin: 0 auto 16px; max-width: 100%; user-select: none; }
-      .ps-crop-wrap img { display: block; max-width: 100%; max-height: 50vh; margin: 0 auto; }
+      .ps-crop-wrap { position: relative; margin: 0 auto 16px; max-width: 100%; user-select: none; border-radius: 12px; overflow: hidden; }
+      .ps-crop-wrap img { display: block; max-width: 100%; max-height: 48vh; margin: 0 auto; }
       .ps-crop-box {
-        position: absolute; border: 2px solid #5E9A1E;
-        box-shadow: 0 0 0 2000px rgba(0,0,0,0.4);
+        position: absolute; border: 2px solid var(--accent);
+        box-shadow: 0 0 0 2000px rgba(20,20,20,0.45);
         cursor: move;
       }
       .ps-handle {
-        position: absolute; width: 16px; height: 16px; background: #5E9A1E;
-        border: 2px solid #fff; border-radius: 50%;
+        position: absolute; width: 16px; height: 16px; background: var(--accent);
+        border: 2px solid #fff; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,.3);
       }
       .ps-handle.nw { top: -9px; left: -9px; cursor: nwse-resize; }
       .ps-handle.ne { top: -9px; right: -9px; cursor: nesw-resize; }
       .ps-handle.sw { bottom: -9px; left: -9px; cursor: nesw-resize; }
       .ps-handle.se { bottom: -9px; right: -9px; cursor: nwse-resize; }
 
-      .ps-actions { display: flex; gap: 10px; margin-top: 8px; }
+      .ps-actions { display: flex; gap: 10px; margin-top: 10px; }
       .ps-btn {
-        flex: 1; height: 44px; border-radius: 10px; border: none;
-        background: #5E9A1E; color: #fff; font-weight: 700; font-size: 14.5px;
-        cursor: pointer;
+        flex: 1; height: 42px; border-radius: 99px; border: 1px solid var(--ink);
+        background: var(--ink); color: #fff; font-weight: 700; font-size: 14px;
+        cursor: pointer; transition: opacity .15s;
       }
-      .ps-btn.secondary { background: #ececec; color: #333; }
-      .ps-btn:disabled { opacity: .5; cursor: not-allowed; }
+      .ps-btn:hover { opacity: .85; }
+      .ps-btn.secondary { background: transparent; color: var(--ink); }
+      .ps-btn.secondary:hover { background: var(--tint); opacity: 1; }
+      .ps-btn:disabled { opacity: .4; cursor: not-allowed; }
 
-      .ps-status { font-size: 13.5px; color: #6b6b68; margin-top: 10px; text-align: center; }
+      .ps-status { font-size: 13px; color: var(--gray); margin-top: 12px; text-align: center; }
       .ps-status.err { color: #c0392b; }
 
-      .ps-results { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 18px; }
-      .ps-card { border-radius: 10px; overflow: hidden; border: 1px solid #eee; text-decoration: none; color: inherit; }
-      .ps-card img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; background: #f4f4f4; }
+      .ps-results { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
+      .ps-card { border-radius: 10px; overflow: hidden; border: 1px solid var(--line); text-decoration: none; color: inherit; transition: box-shadow .15s; }
+      .ps-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,.12); }
+      .ps-card img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; background: var(--tint); }
       .ps-card .ps-card-body { padding: 6px 8px; }
-      .ps-card .ps-id { font-size: 11.5px; font-weight: 700; margin: 0; }
-      .ps-card .ps-pct { font-size: 11px; color: #5E9A1E; margin: 2px 0 0; }
+      .ps-card .ps-id { font-size: 11px; font-weight: 700; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .ps-card .ps-pct { font-size: 10.5px; color: var(--accent); margin: 2px 0 0; font-weight: 600; }
     `;
     const style = document.createElement('style');
     style.textContent = css;
     document.head.appendChild(style);
   }
 
-  // ============== ВХІДНА КНОПКА ==============
+  function renderLensIcon() {
+    const searchWrap = document.querySelector('.search');
+    if (!searchWrap) return;
 
-  function renderEntryButtons() {
-    CONFIG.ENTRY_SELECTORS.forEach(function (selector) {
-      const el = document.querySelector(selector);
-      if (!el) return;
-      const btn = document.createElement('button');
-      btn.className = 'ps-entry-btn';
-      btn.innerHTML =
-        '<span class="ps-entry-icon">🔍</span>' +
-        '<span class="ps-entry-text"><b>Знайти схожий макет за фото</b>' +
-        '<span>Завантаж референс — покажемо найближчі варіанти з каталогу</span></span>';
-      btn.addEventListener('click', openModal);
-      el.appendChild(btn);
-    });
+    const btn = document.createElement('button');
+    btn.className = 'ps-lens-btn';
+    btn.type = 'button';
+    btn.setAttribute('aria-label', 'Пошук схожого макета за фото');
+    btn.innerHTML =
+      '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+      '  <path d="M4 8h3l1.6-2h6.8L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/>' +
+      '  <circle cx="12" cy="13.5" r="3.3"/>' +
+      '</svg>' +
+      '<span class="ps-tooltip">Пошук макета за фото</span>';
+
+    btn.addEventListener('click', openModal);
+    searchWrap.appendChild(btn);
   }
-
-  // ============== МОДАЛЬНЕ ВІКНО ==============
 
   let state = {
     overlay: null,
-    imgEl: null,
     naturalW: 0,
     naturalH: 0,
-    box: { x: 20, y: 20, w: 60, h: 60 }, // у відсотках від розміру картинки
-    dragMode: null, // 'move' | 'nw' | 'ne' | 'sw' | 'se'
+    box: { x: 10, y: 10, w: 80, h: 80 },
+    dragMode: null,
     dragStart: null,
   };
 
@@ -198,20 +191,19 @@
 
   function closeModal() {
     if (state.overlay) state.overlay.remove();
-    state = { overlay: null, imgEl: null, naturalW: 0, naturalH: 0, box: { x: 20, y: 20, w: 60, h: 60 }, dragMode: null, dragStart: null };
+    state = { overlay: null, naturalW: 0, naturalH: 0, box: { x: 10, y: 10, w: 80, h: 80 }, dragMode: null, dragStart: null };
   }
 
   function getBody() {
     return state.overlay.querySelector('.ps-body');
   }
 
-  // --- Крок 1: завантаження файлу ---
   function renderUploadStep() {
     const body = getBody();
     body.innerHTML =
       '<div class="ps-dropzone">' +
       '  <p style="margin:0 0 6px;font-weight:600;">Натисни, щоб вибрати фото</p>' +
-      '  <p style="margin:0;font-size:12.5px;color:#6b6b68;">JPG або PNG</p>' +
+      '  <p style="margin:0;font-size:12.5px;color:var(--gray);">JPG або PNG</p>' +
       '  <input type="file" accept="image/*" style="display:none">' +
       '</div>';
     const dropzone = body.querySelector('.ps-dropzone');
@@ -224,13 +216,10 @@
 
   function handleFile(file) {
     const reader = new FileReader();
-    reader.onload = function () {
-      renderCropStep(reader.result);
-    };
+    reader.onload = function () { renderCropStep(reader.result); };
     reader.readAsDataURL(file);
   }
 
-  // --- Крок 2: обрізка ---
   function renderCropStep(dataUrl) {
     const body = getBody();
     body.innerHTML =
@@ -284,7 +273,7 @@
     function onPointerDown(mode) {
       return function (e) {
         e.preventDefault();
-        e.stopPropagation(); // щоб клік по ручці не викликав ще й "пересування" всієї рамки
+        e.stopPropagation();
         state.dragMode = mode;
         state.dragStart = { x: e.clientX, y: e.clientY, box: Object.assign({}, state.box) };
         document.addEventListener('pointermove', onPointerMove);
@@ -331,7 +320,6 @@
 
   function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
 
-  // Вирізає обрану ділянку з оригінального зображення й повертає base64 (без префіксу data:...)
   function cropToBase64(img) {
     const sx = state.naturalW * state.box.x / 100;
     const sy = state.naturalH * state.box.y / 100;
@@ -347,7 +335,6 @@
     return canvas.toDataURL('image/jpeg', 0.9).split(',')[1];
   }
 
-  // --- Крок 3: пошук ---
   async function runSearch(img, wrap) {
     const body = getBody();
     const statusEl = body.querySelector('.ps-status');
@@ -397,7 +384,7 @@
 
       const a = document.createElement('a');
       a.className = 'ps-card';
-      a.href = '#banery-' + entry.id; // якщо на сторінці є прив'язка до конкретного банера — підправ це посилання
+      a.href = '#banery-' + entry.id;
       a.innerHTML =
         '<img src="' + imgSrc + '" alt="' + entry.id + '" loading="lazy">' +
         '<div class="ps-card-body">' +
@@ -420,10 +407,9 @@
     body.appendChild(backBtn);
   }
 
-  // ============== СТАРТ ==============
   function init() {
     injectStyles();
-    renderEntryButtons();
+    renderLensIcon();
   }
 
   if (document.readyState === 'loading') {
