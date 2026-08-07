@@ -104,11 +104,16 @@
       .ps-crop-box {
         position: absolute; border: 2px solid var(--accent);
         box-shadow: 0 0 0 2000px rgba(20,20,20,0.45);
-        cursor: move;
+        cursor: move; touch-action: none;
       }
       .ps-handle {
         position: absolute; width: 16px; height: 16px; background: var(--accent);
         border: 2px solid #fff; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,.3);
+        touch-action: none;
+      }
+      .ps-handle::before {
+        content: ''; position: absolute; top: 50%; left: 50%;
+        width: 40px; height: 40px; transform: translate(-50%, -50%);
       }
       .ps-handle.nw { top: -9px; left: -9px; cursor: nwse-resize; }
       .ps-handle.ne { top: -9px; right: -9px; cursor: nesw-resize; }
