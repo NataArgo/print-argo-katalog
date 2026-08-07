@@ -284,6 +284,7 @@
     function onPointerDown(mode) {
       return function (e) {
         e.preventDefault();
+        e.stopPropagation(); // щоб клік по ручці не викликав ще й "пересування" всієї рамки
         state.dragMode = mode;
         state.dragStart = { x: e.clientX, y: e.clientY, box: Object.assign({}, state.box) };
         document.addEventListener('pointermove', onPointerMove);
