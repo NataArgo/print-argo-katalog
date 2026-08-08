@@ -50,27 +50,27 @@
   function injectStyles() {
     const css = `
       .ps-lens-btn {
-        position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
-        width: 26px; height: 26px; border-radius: 50%; border: none;
-        background: transparent; display: flex; align-items: center; justify-content: center;
+        position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+        width: 30px; height: 30px; border-radius: 50%; border: none;
+        background: var(--tint); display: flex; align-items: center; justify-content: center;
         cursor: pointer; transition: background .15s;
       }
-      .ps-lens-btn:hover { background: var(--tint); }
-      .ps-lens-btn svg { width: 17px; height: 17px; stroke: var(--gray); }
-      .ps-lens-btn:hover svg { stroke: var(--ink); }
-      .search input { padding-right: 38px; }
-      .qclear { right: 36px !important; }
+      .ps-lens-btn:hover { background: var(--line); }
+      .ps-lens-btn svg { width: 19px; height: 19px; stroke: var(--ink); stroke-width: 2.1; }
+      .search input { padding-right: 42px; }
+      .qclear { right: 40px !important; }
 
       .ps-tooltip {
-        position: absolute; bottom: calc(100% + 8px); right: 0;
-        background: var(--ink); color: #fff; font-size: 12px; font-weight: 500;
-        padding: 6px 10px; border-radius: 8px; white-space: nowrap;
-        opacity: 0; pointer-events: none; transform: translateY(3px);
-        transition: opacity .15s, transform .15s; z-index: 5;
+        position: absolute; top: calc(100% + 8px); right: 0;
+        background: #fff; color: var(--ink); font-size: 12.5px; font-weight: 600;
+        padding: 7px 11px; border-radius: 9px; white-space: nowrap;
+        border: 1px solid var(--line); box-shadow: 0 8px 22px rgba(20,20,20,.14);
+        opacity: 0; pointer-events: none; transform: translateY(-4px);
+        transition: opacity .15s, transform .15s; z-index: 200;
       }
       .ps-tooltip::after {
-        content: ''; position: absolute; top: 100%; right: 10px;
-        border: 5px solid transparent; border-top-color: var(--ink);
+        content: ''; position: absolute; bottom: 100%; right: 10px;
+        border: 5px solid transparent; border-bottom-color: #fff;
       }
       .ps-lens-btn:hover .ps-tooltip { opacity: 1; transform: translateY(0); }
 
