@@ -32,7 +32,7 @@
 <link rel="apple-touch-icon" href="img/favicon_180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#FFFFFF; --ink:#141414; --gray:#8C8C8C; --line:#ECECEA;
@@ -363,25 +363,84 @@ body.admin .psrc{display:block}
 .shreset{height:46px;padding:0 16px;border-radius:12px;border:1px solid var(--line);font-size:14px;font-weight:600}
 .shreset:hover{border-color:var(--ink)}
 
-footer{border-top:1px solid var(--line)}
-.foot{display:flex;flex-wrap:wrap;gap:10px 28px;justify-content:space-between;padding:24px 0 32px;font-size:13px;color:var(--gray)}
-.foot a{text-decoration:none;font-weight:600;color:var(--ink)}
-.foot a:hover{color:var(--accent)}
-.footBrand{display:flex;align-items:flex-start;gap:9px}
-.footLogo{width:20px;height:20px;border-radius:5px;flex:0 0 auto;margin-top:1px}
-.footText{flex:1 1 auto;min-width:0}
-.footSocial{display:inline-flex;align-items:center;gap:6px;vertical-align:middle}
-.footIcon{width:16px;height:16px;flex:0 0 auto}
+footer{border-top:1px solid var(--line);background:var(--tint)}
+.footwrap3{max-width:1240px;margin:0 auto;padding:44px 20px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:36px;font-size:13.5px;color:var(--gray)}
+.footCol{min-width:0}
+.footColLabel{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);margin-bottom:14px}
+.footBrandLink{display:inline-flex;align-items:center;gap:9px;text-decoration:none;margin-bottom:10px}
+.footLogo{width:30px;height:30px;border-radius:7px;flex:0 0 auto}
+.footBrandName{font-weight:800;font-size:17px;letter-spacing:.01em;color:var(--ink)}
+.footBrandName i{font-style:normal;color:#E5194A}
+.footTagline{margin:0;font-size:13px;color:var(--gray);line-height:1.5}
+.footRow{display:block;margin-bottom:9px;color:var(--gray)}
+.footContact{display:inline-flex;align-items:center;gap:7px;color:var(--ink);font-weight:700;text-decoration:none}
+.footContact svg{width:15px;height:15px;flex:0 0 auto}
+.footContact:hover{color:#E5194A}
+.footMsgrow{display:flex;gap:20px}
+.footSocial{display:flex;align-items:center;gap:8px;color:var(--ink);font-weight:700;text-decoration:none}
+.footSocial:hover{color:#E5194A}
+.footIcon{width:18px;height:18px;flex:0 0 auto}
+@media (max-width:760px){
+  .footwrap3{grid-template-columns:1fr;gap:28px}
+}
 .v{position:fixed;bottom:12px;right:14px;font-size:10px;letter-spacing:.1em;color:#C9C9C6;z-index:5}
 body.admin .v::after{content:" · адмін";color:#C2452D;font-weight:700}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ══════════ Головна сторінка (homeView) — версія 3, світла, без прикрас ══════════ */
+#homeView{--paper:#FFFFFF;--signal:#E5194A;--teal:#127A78;background:var(--paper)}
+#homeView .home{background:var(--paper)}
+#homeView .hero{max-width:1240px;margin:0 auto;padding:50px 24px 30px}
+#homeView .hero h1{display:inline-block;margin:0 0 6px;font-size:44px;font-weight:800;letter-spacing:-.01em;line-height:1;font-family:'Manrope',sans-serif;color:var(--ink)}
+#homeView .hero h1 .dot{color:var(--signal)}
+#homeView .subwrap{display:block}
+#homeView .sub{font-size:15px;font-weight:600;color:var(--gray);white-space:nowrap;display:inline-block}
+#homeView .services{max-width:1240px;margin:0 auto;padding:46px 24px 80px}
+#homeView .home-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
+#homeView .home-tile{text-decoration:none;color:var(--ink);display:block;cursor:pointer}
+#homeView .home-photo{aspect-ratio:4/5;background:var(--tint);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+#homeView .home-photo img{width:100%;height:100%;object-fit:contain;transition:transform .35s ease}
+#homeView .home-tile:hover .home-photo img{transform:scale(1.03)}
+#homeView .home-collage{aspect-ratio:4/5;background:var(--tint);display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:2px}
+#homeView .home-collage img{width:100%;height:100%;object-fit:contain;background:var(--tint)}
+#homeView .home-tile-label{padding-top:12px;border-top:2px solid var(--signal)}
+#homeView .home-tile.n2 .home-tile-label{border-top-color:var(--teal)}
+#homeView .home-tile.n4 .home-tile-label{border-top-color:var(--teal)}
+#homeView .home-tile.n6 .home-tile-label,#homeView .home-tile.n7 .home-tile-label{border-top-color:var(--line)}
+#homeView .home-tile-name{font-size:15.5px;font-weight:800;letter-spacing:-.01em}
+#homeView .home-tile-count{font-size:12px;font-weight:600;color:var(--gray);margin-top:2px}
+#homeView .home-tile.service .home-photo{background:#fff;border:1px dashed var(--line)}
+@media (max-width:980px){#homeView .home-grid{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:680px){#homeView .home-grid{grid-template-columns:repeat(2,1fr);gap:18px}}
+
+#homeView .modal-overlay{position:fixed;inset:0;background:rgba(20,20,20,.5);display:none;align-items:center;justify-content:center;padding:20px;z-index:200}
+#homeView .modal-overlay.open{display:flex}
+#homeView .modal-box{background:#fff;max-width:520px;width:100%;padding:40px;position:relative;border-top:3px solid var(--signal)}
+#homeView .modal-close{position:absolute;top:14px;right:16px;width:32px;height:32px;border:none;background:none;font-size:18px;cursor:pointer;color:var(--gray)}
+#homeView .modal-close:hover{color:var(--ink)}
+#homeView .modal-box h2{font-size:24px;font-weight:800;letter-spacing:-.01em;margin:0 0 12px;font-family:'Manrope',sans-serif}
+#homeView .modal-box p{font-size:14.5px;line-height:1.6;color:var(--gray);margin:0 0 26px}
+#homeView .contact-ig{display:flex;align-items:center;gap:12px;background:var(--ink);color:#fff;text-decoration:none;
+  padding:16px 20px;margin-bottom:10px;font-weight:800;font-size:15px;transition:background .15s}
+#homeView .contact-ig:hover{background:var(--signal)}
+#homeView .contact-ig .igsq{width:24px;height:24px;flex:0 0 auto;border-radius:6px;
+  background:radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%);
+  display:flex;align-items:center;justify-content:center}
+#homeView .contact-ig .igsq svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.2}
+#homeView .contact-ig .iglabel{display:flex;flex-direction:column;line-height:1.25}
+#homeView .contact-ig .iglabel small{font-size:11px;font-weight:600;opacity:.65}
+#homeView .contact-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#homeView .contact-mini{display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;border:1px solid var(--line);
+  text-decoration:none;color:var(--ink);padding:13px;font-weight:700;font-size:14px}
+#homeView .contact-mini:hover{border-color:var(--ink)}
+#homeView .contact-mini svg{width:16px;height:16px;flex:0 0 auto}
 </style>
 </head>
 <body>
 
 <header>
   <div class="wrap bar">
-    <a class="logo" href="#banery" id="logo"><b>PRINT<i>.</i>АРГО</b><span>Друк банерів для фотозон</span></a>
+    <a class="logo" href="#" id="logo" onclick="showHome();return false;"><b>PRINT<i>.</i>АРГО</b><span>Друк банерів для фотозон</span></a>
     <nav class="main" id="nav">
       <div class="nlgroup"><button class="nl" data-room="banery" id="navBanery">Банери</button><button class="nlchev" id="navBaneryChev" aria-label="Категорії банерів" aria-haspopup="true"><svg fill="none" stroke-width="2.4" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button></div>
       <div><button class="nl" data-room="fotofony">Фотофони</button></div>
@@ -401,6 +460,113 @@ body.admin .v::after{content:" · адмін";color:#C2452D;font-weight:700}
   <div class="mega" id="mega"><div class="mega-in" id="megaIn"></div></div>
 </header>
 
+<div id="homeView">
+<div class="home">
+  <div class="hero">
+    <h1 id="heroH1">PRINT<span class="dot">.</span>ARGO</h1>
+    <div class="subwrap"><span class="sub" id="heroSub">Широкоформатний друк</span></div>
+  </div>
+
+  <div class="services">
+    <div class="home-grid">
+
+      <a class="home-tile" href="#banery" onclick="go('banery');return false;">
+        <div class="home-collage" id="collage-banery"></div>
+        <div class="home-tile-label"><div class="home-tile-name">Банери для фотозон</div><div class="home-tile-count">700+ макетів</div></div>
+      </a>
+
+      <a class="home-tile n2" href="#karkasy" onclick="go('karkasy');return false;">
+        <div class="home-collage" id="collage-karkasy"></div>
+        <div class="home-tile-label"><div class="home-tile-name">Каркаси для фотозон</div><div class="home-tile-count">4 розміри</div></div>
+      </a>
+
+      <a class="home-tile" href="#fotofony" onclick="go('fotofony');return false;">
+        <div class="home-collage" id="collage-fotofony"></div>
+        <div class="home-tile-label"><div class="home-tile-name">Фотофони</div><div class="home-tile-count">90+ варіантів</div></div>
+      </a>
+
+      <a class="home-tile n4" href="#kutovi" onclick="go('kutovi');return false;">
+        <div class="home-collage" id="collage-kutovi"></div>
+        <div class="home-tile-label"><div class="home-tile-name">Кутові фотофони</div><div class="home-tile-count">100+ варіантів</div></div>
+      </a>
+
+      <a class="home-tile" href="#shyrmy" onclick="go('shyrmy');return false;">
+        <div class="home-collage" id="collage-shyrmy"></div>
+        <div class="home-tile-label"><div class="home-tile-name">Ширми</div><div class="home-tile-count">35+ дизайнів</div></div>
+      </a>
+
+      <a class="home-tile service n6" href="#" onclick="openOrderModal();return false;">
+        <div class="home-photo"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#C7C2B4" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l4-4 4 4 6-6 4 4"/></svg></div>
+        <div class="home-tile-label"><div class="home-tile-name">Рекламні банери</div><div class="home-tile-count">друк за вашим макетом реклами</div></div>
+      </a>
+
+      <a class="home-tile service n7" href="#" onclick="openOrderModal();return false;">
+        <div class="home-photo"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#C7C2B4" stroke-width="1.6"><path d="M12 3v14M5 10l7 7 7-7M4 21h16"/></svg></div>
+        <div class="home-tile-label"><div class="home-tile-name">Друк за вашим макетом</div><div class="home-tile-count">є свій дизайн — надрукуємо</div></div>
+      </a>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="orderModal" onclick="if(event.target===this)closeOrderModal()">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeOrderModal()">✕</button>
+    <h2>Друк за вашим макетом</h2>
+    <p>Надішліть готовий макет — надрукуємо його точно за вашими розмірами. Або скиньте фото чи референс, який вам сподобався, і наш дизайнер допоможе створити схожий дизайн.</p>
+    <a class="contact-ig" href="https://ig.me/m/print.argo">
+      <span class="igsq"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/></svg></span>
+      <span class="iglabel">Написати в Instagram<small>найшвидша відповідь</small></span>
+    </a>
+    <div class="contact-row">
+      <a class="contact-mini" href="viber://chat?number=%2B380677701635">Viber</a>
+      <a class="contact-mini" href="https://t.me/+380677701635">Telegram</a>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+function openOrderModal(){document.getElementById('orderModal').classList.add('open');}
+function closeOrderModal(){document.getElementById('orderModal').classList.remove('open');}
+function syncHomeSub(){
+  var logo=document.getElementById('heroH1'), sub=document.getElementById('heroSub');
+  if(!logo||!sub)return;
+  sub.style.letterSpacing='0px';
+  var targetW=logo.getBoundingClientRect().width;
+  var naturalW=sub.getBoundingClientRect().width;
+  var chars=sub.textContent.length;
+  var extra=(targetW-naturalW)/(chars-1);
+  if(extra>0 && extra<8){ sub.style.letterSpacing=extra+'px'; }
+}
+if(document.fonts&&document.fonts.ready){document.fonts.ready.then(syncHomeSub);}
+window.addEventListener('load',syncHomeSub);
+window.addEventListener('resize',syncHomeSub);
+
+/* ── Випадковий підбір макетів у плитках — з ПОВНОЇ бази каталогу D, щоразу інший при відкритті ── */
+function shufflePick(arr, n){
+  var copy = arr.slice();
+  for(var i = copy.length - 1; i > 0; i--){
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = copy[i]; copy[i] = copy[j]; copy[j] = t;
+  }
+  return copy.slice(0, n);
+}
+function fillHomeCollages(){
+  function fill(id, list, n){
+    var box=document.getElementById(id);
+    if(!box || !list || !list.length) return;
+    var picks = shufflePick(list, Math.min(n, list.length));
+    box.innerHTML = picks.map(function(d){ return '<img src="'+d.img+'" alt="">'; }).join('');
+  }
+  fill('collage-banery', D.banery, 4);
+  fill('collage-fotofony', D.fotofony, 4);
+  fill('collage-kutovi', D.kutovi, 4);
+  fill('collage-shyrmy', D.shyrmy, 4);
+  var kbox=document.getElementById('collage-karkasy');
+  if(kbox && D.karkasy) kbox.innerHTML = D.karkasy.map(function(d){ return '<img src="'+d.img+'" alt="">'; }).join('');
+}
+</script>
+
 <div class="drawer" id="drawer">
   <div class="dim"></div>
   <div class="panel">
@@ -414,7 +580,7 @@ body.admin .v::after{content:" · адмін";color:#C2452D;font-weight:700}
   </div>
 </div>
 
-<main class="wrap">
+<main class="wrap" style="display:none">
   <section class="intro">
     <h1 id="pTitle"></h1>
     <p class="lead" id="pLead"></p>
@@ -454,13 +620,33 @@ body.admin .v::after{content:" · адмін";color:#C2452D;font-weight:700}
   </div>
 </div>
 <footer>
-  <div class="wrap foot">
-    <span class="footBrand"><img src="favicon.ico" alt="" class="footLogo"><span class="footText">print.АРГО — виробничо-рекламна агенція, м. Хмельницький · Доставка Новою поштою по Україні · <a href="tel:+380677701635">067 770 16 35</a></span></span>
-    <span>
-      <a href="https://www.instagram.com/print.argo" target="_blank" rel="noopener" class="footSocial"><svg class="footIcon" viewBox="0 0 24 24"><defs><linearGradient id="igGrad" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#FEDA75"/><stop offset="30%" stop-color="#FA7E1E"/><stop offset="60%" stop-color="#D62976"/><stop offset="85%" stop-color="#962FBF"/><stop offset="100%" stop-color="#4F5BD5"/></linearGradient></defs><rect x="2" y="2" width="20" height="20" rx="6" fill="url(#igGrad)"/><circle cx="12" cy="12" r="4.3" fill="none" stroke="#fff" stroke-width="1.7"/><circle cx="17.3" cy="6.7" r="1.1" fill="#fff"/></svg>Instagram</a>
-      &nbsp;
-      <a href="https://print-argo.prom.ua/ua/" target="_blank" rel="noopener" class="footSocial"><svg class="footIcon" viewBox="0 0 24 24" fill="none"><path d="M6 8h12l-1.2 10.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 8z" fill="#7B04DF"/><path d="M9 8a3 3 0 0 1 6 0" stroke="#7B04DF" stroke-width="1.8"/></svg>Prom.ua</a>
-    </span>
+  <div class="wrap footwrap3">
+    <div class="footCol footBrandCol">
+      <a class="footBrandLink" href="#" onclick="showHome();return false;">
+        <img src="favicon.ico" alt="" class="footLogo">
+        <span class="footBrandName">PRINT<i>.</i>АРГО</span>
+      </a>
+      <p class="footTagline">Широкоформатний друк</p>
+    </div>
+
+    <div class="footCol">
+      <div class="footColLabel">Контакти</div>
+      <div class="footRow">м. Хмельницький</div>
+      <a class="footRow footContact" href="tel:+380677701635">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1L6.6 10.8z"/></svg>
+        067 770 16 35
+      </a>
+      <div class="footRow footMsgrow">
+        <a class="footContact" href="viber://chat?number=%2B380677701635"><svg viewBox="0 0 24 24" fill="none" stroke="#7360F2" stroke-width="1.8"><path d="M12 3C7 3 3 6.5 3 11c0 2.6 1.5 4.9 3.7 6.4L6 21l4-2c.6.1 1.3.1 2 .1 5 0 9-3.5 9-8s-4-8-9-8z"/></svg>Viber</a>
+        <a class="footContact" href="https://t.me/+380677701635"><svg viewBox="0 0 24 24" fill="none" stroke="#29B6F6" stroke-width="1.8"><path d="M21 4 3 11l6 2.5M21 4l-3.5 16-8-6.5M21 4 9.5 13.5"/></svg>Telegram</a>
+      </div>
+    </div>
+
+    <div class="footCol">
+      <div class="footColLabel">Ми в мережі</div>
+      <a href="https://www.instagram.com/print.argo" target="_blank" rel="noopener" class="footRow footSocial"><svg class="footIcon" viewBox="0 0 24 24"><defs><linearGradient id="igGrad" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#FEDA75"/><stop offset="30%" stop-color="#FA7E1E"/><stop offset="60%" stop-color="#D62976"/><stop offset="85%" stop-color="#962FBF"/><stop offset="100%" stop-color="#4F5BD5"/></linearGradient></defs><rect x="2" y="2" width="20" height="20" rx="6" fill="url(#igGrad)"/><circle cx="12" cy="12" r="4.3" fill="none" stroke="#fff" stroke-width="1.7"/><circle cx="17.3" cy="6.7" r="1.1" fill="#fff"/></svg>Instagram</a>
+      <a href="https://print-argo.prom.ua/ua/" target="_blank" rel="noopener" class="footRow footSocial"><svg class="footIcon" viewBox="0 0 24 24" fill="none"><path d="M6 8h12l-1.2 10.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 8z" fill="#7B04DF"/><path d="M9 8a3 3 0 0 1 6 0" stroke="#7B04DF" stroke-width="1.8"/></svg>Prom.ua</a>
+    </div>
   </div>
 </footer>
 
@@ -547,7 +733,16 @@ const $=s=>document.querySelector(s);
 const uah=n=>n.toLocaleString('uk-UA')+" грн";
 
 /* ───── Навігація ───── */
+function showHome(){
+  const hv=document.getElementById('homeView');if(hv)hv.style.display='';
+  const mn=document.querySelector('main.wrap');if(mn)mn.style.display='none';
+  closeMega();closeDrawer();
+  window.scrollTo({top:0});
+  if(location.hash)history.replaceState(null,'',location.pathname+location.search);
+}
 function go(room,ev){
+  const hv=document.getElementById('homeView');if(hv)hv.style.display='none';
+  const mn=document.querySelector('main.wrap');if(mn)mn.style.display='';
   state.room=room;state.event=ev||null;state.cat=null;state.tag=null;state.age=null;state.who=null;state.colors=[];state.q="";$("#q").value="";
   closeMega();closeDrawer();render();window.scrollTo({top:0});
   location.hash=room;
@@ -1293,6 +1488,14 @@ if(_maketParam){
   const _p=D.banery.find(d=>String(d.id).toLowerCase()===_maketParam.toLowerCase());
   if(_p)openProduct({...(_p),kind:"banner"});
 }
+const _hashRoom=(location.hash||"").replace('#','');
+if(ROOMS[_hashRoom]){
+  const hv=document.getElementById('homeView');if(hv)hv.style.display='none';
+  const mn=document.querySelector('main.wrap');if(mn)mn.style.display='';
+}else{
+  showHome();
+}
+fillHomeCollages();
 
 </script>
 
