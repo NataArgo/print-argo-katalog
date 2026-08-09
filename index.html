@@ -413,9 +413,9 @@ body.admin .v::after{content:" · адмін";color:#C2452D;font-weight:700}
 #homeView .feat-img:hover .feat-photo img{transform:scale(1.03)}
 #homeView .feat-row.feat-simple h2{font-size:18px}
 @media (max-width:820px){
-  #homeView .feat-grid{grid-template-columns:1fr}
-  #homeView .feat-row{grid-template-columns:1fr}
-  #homeView .feat-img{order:-1}
+  #homeView .feat-grid{grid-template-columns:1fr;gap:16px;background:transparent;padding:0 4px}
+  #homeView .feat-row{grid-template-columns:1fr;gap:0;padding:0;border-radius:18px;overflow:hidden;border:1px solid var(--line);box-shadow:0 1px 3px rgba(20,20,20,.06),0 10px 26px rgba(20,20,20,.05)}
+  #homeView .feat-text{padding:20px 20px 22px}
 }
 
 #homeView .modal-overlay{position:fixed;inset:0;background:rgba(20,20,20,.5);display:none;align-items:center;justify-content:center;padding:20px;z-index:200}
@@ -503,7 +503,7 @@ body.admin .v::after{content:" · адмін";color:#C2452D;font-weight:700}
           </ul>
           <a class="feat-link" href="#karkasy" onclick="go('karkasy');return false;">Переглянути всі →</a>
         </div>
-        <a class="feat-img" href="#karkasy" onclick="go('karkasy');return false;"><div class="feat-photo" id="collage-karkasy"></div></a>
+        <a class="feat-img" href="#karkasy" onclick="go('karkasy');return false;"><div class="feat-photo"><img src="img/karkasy-cover.jpg" alt=""></div></a>
       </div>
 
       <div class="feat-row">
@@ -629,11 +629,6 @@ function fillHomeCollages(){
   fill('collage-fotofony', D.fotofony, 1);
   fill('collage-kutovi', D.kutovi, 1);
   fill('collage-shyrmy', D.shyrmy, 1);
-  var kbox=document.getElementById('collage-karkasy');
-  if(kbox && D.karkasy && D.karkasy.length){
-    var kpick = D.karkasy[Math.floor(Math.random()*D.karkasy.length)];
-    kbox.innerHTML = '<img src="'+kpick.img+'" alt="">';
-  }
 }
 </script>
 
