@@ -32,7 +32,7 @@
 <link rel="apple-touch-icon" href="img/favicon_180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#FFFFFF; --ink:#141414; --gray:#8C8C8C; --line:#ECECEA;
@@ -375,13 +375,100 @@ footer{border-top:1px solid var(--line)}
 .v{position:fixed;bottom:12px;right:14px;font-size:10px;letter-spacing:.1em;color:#C9C9C6;z-index:5}
 body.admin .v::after{content:" · адмін";color:#C2452D;font-weight:700}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ══════════ Головна сторінка (homeView) ══════════ */
+#homeView{--home-accent:#EC4F75;--home-brand:#E5194A;background:var(--bg)}
+#homeView .home-bgfade{position:absolute;top:0;left:0;right:0;height:420px;pointer-events:none;
+  background:linear-gradient(180deg, #E3F5F2 0%, #FFFFFF 100%)}
+#homeView .home-mark{position:absolute;width:14px;height:14px;pointer-events:none;opacity:0;transition:opacity .25s ease}
+#homeView .home-mark::before,#homeView .home-mark::after{content:'';position:absolute;background:var(--home-accent)}
+#homeView .home-mark::before{width:14px;height:1.5px;top:50%;left:0;transform:translateY(-50%)}
+#homeView .home-mark::after{width:1.5px;height:14px;left:50%;top:0;transform:translateX(-50%)}
+#homeView .home-mark.tl{top:10px;left:10px}
+#homeView .home-mark.tr{top:10px;right:10px}
+#homeView .home-mark.bl{bottom:10px;left:10px}
+#homeView .home-mark.br{bottom:10px;right:10px}
+#homeView .home-tile:hover .home-mark{opacity:1}
+#homeView .home-hero{max-width:1160px;margin:0 auto;padding:70px 24px 44px;text-align:center;position:relative}
+#homeView .home-balloons{position:absolute;top:-18px;left:0;right:0;height:220px;pointer-events:none;z-index:0;overflow:hidden}
+#homeView .home-balloons svg{position:absolute;opacity:.32}
+@media(prefers-reduced-motion:no-preference){
+  #homeView .home-balloons svg{animation:homeBfloat 7s ease-in-out infinite}
+}
+@keyframes homeBfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+#homeView .home-logo,#homeView .home-sub,#homeView .home-lines,#homeView .home-cta{position:relative;z-index:1}
+#homeView .home-logo{display:inline-block;font-size:26px;font-weight:800;letter-spacing:.01em;color:var(--ink);margin-bottom:6px;font-family:'Manrope',sans-serif}
+#homeView .home-logo .dot{color:var(--home-brand)}
+#homeView .home-sub{display:flex;justify-content:space-between;margin:0 auto 30px;font-size:11px;font-weight:600;letter-spacing:.02em;text-transform:uppercase;color:var(--gray)}
+#homeView .home-lines{list-style:none;margin:0 0 30px;padding:0;display:flex;flex-wrap:wrap;justify-content:center;gap:8px 26px;max-width:560px;margin-left:auto;margin-right:auto}
+#homeView .home-lines li{display:flex;align-items:center;gap:7px;font-size:14.5px;font-weight:600;color:#3d3d3d}
+#homeView .home-lines li svg{width:16px;height:16px;stroke:var(--home-accent);stroke-width:2.4;flex:0 0 auto}
+#homeView .home-cta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+#homeView .home-btn{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border-radius:10px;font-size:14.5px;font-weight:700;text-decoration:none;border:1px solid transparent;transition:opacity .15s ease;font-family:'Manrope',sans-serif}
+#homeView .home-btn-quiet{background:var(--tint);color:var(--gray);border-color:var(--line);padding:9px 18px;font-size:13px;border-radius:9px}
+#homeView .home-btn-quiet:hover{color:var(--ink);border-color:var(--ink)}
+#homeView .home-services{max-width:1160px;margin:0 auto;padding:10px 24px 70px}
+#homeView .home-grid{display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:150px;gap:12px}
+#homeView .home-tile{position:relative;overflow:hidden;border-radius:16px;text-decoration:none;color:#fff;
+  display:flex;align-items:flex-end;padding:18px;isolation:isolate;grid-column:span 2;grid-row:span 2;cursor:pointer}
+#homeView .home-tile.big{grid-column:span 6;grid-row:span 3}
+#homeView .home-tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s cubic-bezier(.2,.8,.2,1);z-index:-2}
+#homeView .home-tile:hover img{transform:scale(1.06)}
+#homeView .home-tile::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,20,20,0) 40%,rgba(20,20,20,.82) 100%);z-index:-1}
+#homeView .home-tile-slides{position:absolute;inset:0;z-index:-2;--stagger:0s}
+#homeView .home-tile-slides img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;animation:homeXfade 18s infinite ease-in-out}
+#homeView .home-tile-slides img:nth-child(1){animation-delay:var(--stagger)}
+#homeView .home-tile-slides img:nth-child(2){animation-delay:calc(var(--stagger) + 6s)}
+#homeView .home-tile-slides img:nth-child(3){animation-delay:calc(var(--stagger) + 12s)}
+#homeView .home-tile:hover .home-tile-slides img{animation-play-state:paused;transform:scale(1.06);transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+@keyframes homeXfade{0%{opacity:0}4%{opacity:1}28%{opacity:1}34%{opacity:0}100%{opacity:0}}
+@media (prefers-reduced-motion: reduce){
+  #homeView .home-tile-slides img{animation:none}
+  #homeView .home-tile-slides img:first-child{opacity:1}
+}
+#homeView .home-tile-label{display:inline-block;background:rgba(255,255,255,.94);padding:8px 13px;border-radius:11px;max-width:100%;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+#homeView .home-tile-name{font-size:16px;font-weight:800;letter-spacing:-.01em;color:var(--ink);font-family:'Manrope',sans-serif}
+#homeView .home-tile-count{font-size:12px;font-weight:600;color:var(--gray);margin-top:1px}
+#homeView .home-tile.big .home-tile-label{padding:10px 16px}
+#homeView .home-tile.big .home-tile-name{font-size:24px}
+#homeView .home-tile.service{background:var(--tint);align-items:flex-start;flex-direction:column;justify-content:flex-end;color:var(--ink)}
+#homeView .home-tile.service::before{display:none}
+#homeView .home-tile.service img{display:none}
+#homeView .home-tile.service .home-badge{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;background:rgba(236,79,117,.13);color:var(--home-accent);padding:4px 9px;border-radius:20px;margin-bottom:auto}
+#homeView .home-tile.service .home-tile-count{color:var(--gray)}
+@media (max-width:820px){
+  #homeView .home-grid{grid-template-columns:repeat(2,1fr);grid-auto-rows:150px}
+  #homeView .home-tile{grid-column:span 1 !important;grid-row:span 2 !important}
+  #homeView .home-tile.big{grid-column:span 2 !important;grid-row:span 2 !important}
+}
+#homeView .home-custom-section{max-width:1160px;margin:0 auto;padding:10px 24px 80px;scroll-margin-top:90px}
+#homeView .home-custom-card{background:var(--tint);border-radius:20px;padding:44px;max-width:560px;margin:0 auto}
+#homeView .home-custom-text h2{font-size:26px;font-weight:800;letter-spacing:-.01em;margin:0 0 14px;font-family:'Manrope',sans-serif}
+#homeView .home-custom-text p{font-size:15px;line-height:1.6;color:var(--gray);margin:0 0 28px}
+#homeView .home-contact-ig{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none;
+  background:linear-gradient(135deg,#f9ce34,#ee2a7b,#6228d7);padding:16px 20px;border-radius:14px;font-weight:800;font-size:15.5px;margin-bottom:10px;transition:transform .15s ease}
+#homeView .home-contact-ig:hover{transform:translateY(-2px)}
+#homeView .home-contact-ig .home-ig-icon{width:26px;height:26px;flex:0 0 auto;border-radius:8px;
+  background:radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%);
+  display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px rgba(255,255,255,.9)}
+#homeView .home-contact-ig .home-ig-icon svg{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:2}
+#homeView .home-contact-ig .home-ig-label{display:flex;flex-direction:column;line-height:1.25}
+#homeView .home-contact-ig .home-ig-label small{font-size:11.5px;font-weight:600;opacity:.65}
+#homeView .home-contact-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#homeView .home-contact-mini{display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;border:1px solid var(--line);
+  text-decoration:none;color:var(--ink);padding:12px;border-radius:12px;font-weight:700;font-size:13.5px}
+#homeView .home-contact-mini:hover{border-color:var(--ink)}
+#homeView .home-contact-mini svg{width:17px;height:17px;flex:0 0 auto}
+@media (max-width:760px){
+  #homeView .home-custom-card{padding:28px}
+}
 </style>
 </head>
 <body>
 
 <header>
   <div class="wrap bar">
-    <a class="logo" href="#banery" id="logo"><b>PRINT<i>.</i>АРГО</b><span>Друк банерів для фотозон</span></a>
+    <a class="logo" href="#" id="logo" onclick="showHome();return false;"><b>PRINT<i>.</i>АРГО</b><span>Друк банерів для фотозон</span></a>
     <nav class="main" id="nav">
       <div class="nlgroup"><button class="nl" data-room="banery" id="navBanery">Банери</button><button class="nlchev" id="navBaneryChev" aria-label="Категорії банерів" aria-haspopup="true"><svg fill="none" stroke-width="2.4" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button></div>
       <div><button class="nl" data-room="fotofony">Фотофони</button></div>
@@ -401,6 +488,173 @@ body.admin .v::after{content:" · адмін";color:#C2452D;font-weight:700}
   <div class="mega" id="mega"><div class="mega-in" id="megaIn"></div></div>
 </header>
 
+<div id="homeView">
+
+<div class="home-bgfade" aria-hidden="true"></div>
+<div class="home-hero">
+  <div class="home-balloons" aria-hidden="true">
+    <svg width="52" height="90" viewBox="0 0 52 90" style="left:8%;top:6px;animation-delay:0s">
+      <defs><radialGradient id="bg1" cx="34%" cy="26%" r="78%">
+        <stop offset="0%" stop-color="#EAFBFA"/><stop offset="48%" stop-color="#4FC7C5"/><stop offset="100%" stop-color="#1C9694"/>
+      </radialGradient></defs>
+      <path d="M26 60 C34 60 34 68 26 68 C18 68 18 60 26 60 Z" fill="#1C9694"/>
+      <path d="M26 68 C33 71 20 76 27 79 C34 82 21 85 26 88" stroke="#B7DEDD" stroke-width="1.2" fill="none"/>
+      <ellipse cx="26" cy="28" rx="24" ry="28" fill="url(#bg1)"/>
+      <ellipse cx="18" cy="16" rx="6.5" ry="9" fill="#fff" opacity=".55"/>
+    </svg>
+    <svg width="38" height="66" viewBox="0 0 38 66" style="left:20%;top:38px;animation-delay:.6s">
+      <defs><radialGradient id="bg2" cx="34%" cy="26%" r="78%">
+        <stop offset="0%" stop-color="#FFFFFF"/><stop offset="45%" stop-color="#E9E2D9"/><stop offset="100%" stop-color="#C7BCAE"/>
+      </radialGradient></defs>
+      <path d="M19 44 C25 44 25 50 19 50 C13 50 13 44 19 44 Z" fill="#C7BCAE"/>
+      <path d="M19 50 C25 53 14 57 20 60 C26 63 15 66 19 69" stroke="#DAD2C7" stroke-width="1.1" fill="none"/>
+      <ellipse cx="19" cy="21" rx="18" ry="21" fill="url(#bg2)"/>
+      <ellipse cx="13" cy="12" rx="5" ry="6.8" fill="#fff" opacity=".65"/>
+    </svg>
+    <svg width="46" height="80" viewBox="0 0 46 80" style="right:10%;top:0;animation-delay:.3s">
+      <defs><radialGradient id="bg3" cx="34%" cy="26%" r="78%">
+        <stop offset="0%" stop-color="#FFE8EF"/><stop offset="48%" stop-color="#EC6F9A"/><stop offset="100%" stop-color="#C23A6B"/>
+      </radialGradient></defs>
+      <path d="M23 52 C29 52 29 58 23 58 C17 58 17 52 23 52 Z" fill="#C23A6B"/>
+      <path d="M23 58 C30 61 16 65 24 68 C31 71 17 74 23 77" stroke="#F3C4D5" stroke-width="1.2" fill="none"/>
+      <ellipse cx="23" cy="25" rx="21" ry="25" fill="url(#bg3)"/>
+      <ellipse cx="16" cy="14" rx="6" ry="8" fill="#fff" opacity=".55"/>
+    </svg>
+    <svg width="32" height="56" viewBox="0 0 32 56" style="right:24%;top:44px;animation-delay:.9s">
+      <defs><radialGradient id="bg4" cx="34%" cy="26%" r="78%">
+        <stop offset="0%" stop-color="#FFDCE7"/><stop offset="48%" stop-color="#E5194A"/><stop offset="100%" stop-color="#A31038"/>
+      </radialGradient></defs>
+      <path d="M16 37 C21 37 21 42 16 42 C11 42 11 37 16 37 Z" fill="#A31038"/>
+      <path d="M16 42 C21 44 12 47 17 49 C22 51 13 54 16 56" stroke="#F5B9C9" stroke-width="1" fill="none"/>
+      <ellipse cx="16" cy="18" rx="15" ry="18" fill="url(#bg4)"/>
+      <ellipse cx="11" cy="10" rx="4.2" ry="5.6" fill="#fff" opacity=".55"/>
+    </svg>
+    <svg width="27" height="48" viewBox="0 0 27 48" style="left:44%;top:2px;animation-delay:.45s">
+      <defs><radialGradient id="bg5" cx="34%" cy="26%" r="78%">
+        <stop offset="0%" stop-color="#EAFBFA"/><stop offset="48%" stop-color="#4FC7C5"/><stop offset="100%" stop-color="#1C9694"/>
+      </radialGradient></defs>
+      <path d="M13.5 31 C17.5 31 17.5 35 13.5 35 C9.5 35 9.5 31 13.5 31 Z" fill="#1C9694"/>
+      <path d="M13.5 35 C18 37 10 40 14 42 C18 44 11 46 13.5 48" stroke="#B7DEDD" stroke-width="1" fill="none"/>
+      <ellipse cx="13.5" cy="15" rx="12.5" ry="15" fill="url(#bg5)"/>
+      <ellipse cx="9.5" cy="8.5" rx="3.5" ry="4.7" fill="#fff" opacity=".6"/>
+    </svg>
+  </div>
+  <div class="home-logo">PRINT<span class="dot">.</span>ARGO</div>
+  <div class="home-sub" id="heroSub"><span>Широкоформатний</span><span>друк</span></div>
+  <ul class="home-lines">
+    <li><svg fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>Понад 1300 готових макетів для фотозон</li>
+    <li><svg fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>Друкуємо і ваш власний дизайн</li>
+    <li><svg fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>Доставка Новою поштою по Україні</li>
+  </ul>
+  <div class="home-cta">
+    <a class="home-btn home-btn-quiet" href="#svij-maket">Замовити свій макет</a>
+  </div>
+</div>
+
+<div class="home-services">
+  <div class="home-grid">
+    <a class="home-tile big" href="#banery" onclick="go('banery');return false;">
+      <div class="home-tile-slides" style="--stagger:0s">
+        <img src="https://raw.githubusercontent.com/NataArgo/print-argo-katalog/main/img/089.jpg" alt="">
+        <img src="https://raw.githubusercontent.com/NataArgo/print-argo-katalog/main/img/300.jpg" alt="">
+        <img src="https://raw.githubusercontent.com/NataArgo/print-argo-katalog/main/img/104.jpg" alt="">
+      </div>
+      <span class="home-mark tl"></span><span class="home-mark tr"></span><span class="home-mark bl"></span><span class="home-mark br"></span>
+      <div class="home-tile-label"><div class="home-tile-name">Банери для фотозон</div><div class="home-tile-count">700+ макетів</div></div>
+    </a>
+
+    <a class="home-tile" href="#karkasy" onclick="go('karkasy');return false;">
+      <div class="home-tile-slides" style="--stagger:-2s">
+        <img src="https://images.prom.ua/2633444097_metalevij-karkas-dlya.jpg" alt="">
+        <img src="https://images.prom.ua/2633444998_metalevij-karkas-dlya.jpg" alt="">
+        <img src="https://images.prom.ua/2633435665_metalevij-karkas-dlya.jpg" alt="">
+      </div>
+      <span class="home-mark tl"></span><span class="home-mark tr"></span><span class="home-mark bl"></span><span class="home-mark br"></span>
+      <div class="home-tile-label"><div class="home-tile-name">Каркаси для фотозон</div><div class="home-tile-count">4 розміри</div></div>
+    </a>
+
+    <a class="home-tile" href="#fotofony" onclick="go('fotofony');return false;">
+      <div class="home-tile-slides" style="--stagger:-4s">
+        <img src="https://images.prom.ua/2315125614_fotofon.jpg" alt="">
+        <img src="https://images.prom.ua/2315127628_fotofon.jpg" alt="">
+        <img src="https://images.prom.ua/2315129591_fotofon.jpg" alt="">
+      </div>
+      <span class="home-mark tl"></span><span class="home-mark tr"></span><span class="home-mark bl"></span><span class="home-mark br"></span>
+      <div class="home-tile-label"><div class="home-tile-name">Фотофони</div><div class="home-tile-count">90+ варіантів</div></div>
+    </a>
+
+    <a class="home-tile" href="#kutovi" onclick="go('kutovi');return false;">
+      <div class="home-tile-slides" style="--stagger:-6s">
+        <img src="https://images.prom.ua/2634128078_vinilovij-fotofon-50h50h50.jpg" alt="">
+        <img src="https://images.prom.ua/2664859965_vinilovij-fotofon-50h50h50.jpg" alt="">
+        <img src="https://images.prom.ua/2664893879_vinilovij-fotofon-50h50h50.jpg" alt="">
+      </div>
+      <span class="home-mark tl"></span><span class="home-mark tr"></span><span class="home-mark bl"></span><span class="home-mark br"></span>
+      <div class="home-tile-label"><div class="home-tile-name">Кутові фотофони</div><div class="home-tile-count">100+ варіантів</div></div>
+    </a>
+
+    <a class="home-tile" href="#shyrmy" onclick="go('shyrmy');return false;">
+      <div class="home-tile-slides" style="--stagger:-8s">
+        <img src="https://images.prom.ua/4014836439_shirma-new-york.jpg" alt="">
+        <img src="https://images.prom.ua/4016495164_shirma-fluid.jpg" alt="">
+        <img src="https://images.prom.ua/4038263409_shirma-lavender-field.jpg" alt="">
+      </div>
+      <span class="home-mark tl"></span><span class="home-mark tr"></span><span class="home-mark bl"></span><span class="home-mark br"></span>
+      <div class="home-tile-label"><div class="home-tile-name">Ширми</div><div class="home-tile-count">35+ дизайнів</div></div>
+    </a>
+
+    <a class="home-tile service" href="#svij-maket">
+      <span class="home-badge">Послуга</span>
+      <span class="home-mark tl"></span><span class="home-mark tr"></span>
+      <div><div class="home-tile-name">Рекламні банери</div><div class="home-tile-count">друк за вашим макетом реклами</div></div>
+    </a>
+
+    <a class="home-tile service" href="#svij-maket">
+      <span class="home-badge">Послуга</span>
+      <span class="home-mark tl"></span><span class="home-mark tr"></span>
+      <div><div class="home-tile-name">Друк за вашим макетом</div><div class="home-tile-count">є свій дизайн — надрукуємо</div></div>
+    </a>
+  </div>
+</div>
+
+<div class="home-custom-section" id="svij-maket">
+  <div class="home-custom-card">
+    <div class="home-custom-text">
+      <h2>Друк за вашим макетом</h2>
+      <p>Надішліть готовий макет — надрукуємо його точно за вашими розмірами. Або скиньте фото чи референс, який вам сподобався, і наш дизайнер допоможе створити схожий дизайн.</p>
+
+      <a class="home-contact-ig" href="https://ig.me/m/print.argo">
+        <span class="home-ig-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1" fill="#fff" stroke="none"/></svg></span>
+        <span class="home-ig-label">Написати в Instagram<small>найшвидша відповідь</small></span>
+      </a>
+
+      <div class="home-contact-row">
+        <a class="home-contact-mini" href="viber://chat?number=%2B380677701635">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#7360F2" stroke-width="1.8"><path d="M12 3C7 3 3 6.5 3 11c0 2.6 1.5 4.9 3.7 6.4L6 21l4-2c.6.1 1.3.1 2 .1 5 0 9-3.5 9-8s-4-8-9-8z"/></svg>
+          Viber
+        </a>
+        <a class="home-contact-mini" href="https://t.me/+380677701635">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#29B6F6" stroke-width="1.8"><path d="M21 4 3 11l6 2.5M21 4l-3.5 16-8-6.5M21 4 9.5 13.5"/></svg>
+          Telegram
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+<script>
+function syncHomeSubWidth(){
+  var logo=document.querySelector('.home-logo');
+  var sub=document.getElementById('heroSub');
+  if(logo&&sub){sub.style.width=logo.getBoundingClientRect().width+'px';}
+}
+if(document.fonts&&document.fonts.ready){document.fonts.ready.then(syncHomeSubWidth);}
+window.addEventListener('load',syncHomeSubWidth);
+window.addEventListener('resize',syncHomeSubWidth);
+</script>
+
 <div class="drawer" id="drawer">
   <div class="dim"></div>
   <div class="panel">
@@ -414,7 +668,7 @@ body.admin .v::after{content:" · адмін";color:#C2452D;font-weight:700}
   </div>
 </div>
 
-<main class="wrap">
+<main class="wrap" style="display:none">
   <section class="intro">
     <h1 id="pTitle"></h1>
     <p class="lead" id="pLead"></p>
@@ -455,7 +709,7 @@ body.admin .v::after{content:" · адмін";color:#C2452D;font-weight:700}
 </div>
 <footer>
   <div class="wrap foot">
-    <span class="footBrand"><img src="favicon.ico" alt="" class="footLogo"><span class="footText">print.АРГО — виробничо-рекламна агенція, м. Хмельницький · Доставка Новою поштою по Україні · <a href="tel:+380677701635">067 770 16 35</a></span></span>
+    <span class="footBrand"><img src="favicon.ico" alt="" class="footLogo"><span class="footText">print.АРГО — широкоформатний друк, м. Хмельницький · Доставка Новою поштою по Україні · <a href="tel:+380677701635">067 770 16 35</a></span></span>
     <span>
       <a href="https://www.instagram.com/print.argo" target="_blank" rel="noopener" class="footSocial"><svg class="footIcon" viewBox="0 0 24 24"><defs><linearGradient id="igGrad" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#FEDA75"/><stop offset="30%" stop-color="#FA7E1E"/><stop offset="60%" stop-color="#D62976"/><stop offset="85%" stop-color="#962FBF"/><stop offset="100%" stop-color="#4F5BD5"/></linearGradient></defs><rect x="2" y="2" width="20" height="20" rx="6" fill="url(#igGrad)"/><circle cx="12" cy="12" r="4.3" fill="none" stroke="#fff" stroke-width="1.7"/><circle cx="17.3" cy="6.7" r="1.1" fill="#fff"/></svg>Instagram</a>
       &nbsp;
@@ -547,7 +801,16 @@ const $=s=>document.querySelector(s);
 const uah=n=>n.toLocaleString('uk-UA')+" грн";
 
 /* ───── Навігація ───── */
+function showHome(){
+  const hv=document.getElementById('homeView');if(hv)hv.style.display='';
+  const mn=document.querySelector('main.wrap');if(mn)mn.style.display='none';
+  closeMega();closeDrawer();
+  window.scrollTo({top:0});
+  if(location.hash)history.replaceState(null,'',location.pathname+location.search);
+}
 function go(room,ev){
+  const hv=document.getElementById('homeView');if(hv)hv.style.display='none';
+  const mn=document.querySelector('main.wrap');if(mn)mn.style.display='';
   state.room=room;state.event=ev||null;state.cat=null;state.tag=null;state.age=null;state.who=null;state.colors=[];state.q="";$("#q").value="";
   closeMega();closeDrawer();render();window.scrollTo({top:0});
   location.hash=room;
@@ -1292,6 +1555,13 @@ render();
 if(_maketParam){
   const _p=D.banery.find(d=>String(d.id).toLowerCase()===_maketParam.toLowerCase());
   if(_p)openProduct({...(_p),kind:"banner"});
+}
+const _hashRoom=(location.hash||"").replace('#','');
+if(ROOMS[_hashRoom]){
+  const hv=document.getElementById('homeView');if(hv)hv.style.display='none';
+  const mn=document.querySelector('main.wrap');if(mn)mn.style.display='';
+}else{
+  showHome();
 }
 
 </script>
