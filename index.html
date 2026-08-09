@@ -412,6 +412,12 @@ body.admin .v::after{content:" · адмін";color:#C2452D;font-weight:700}
 #homeView .feat-photo img{width:100%;height:100%;object-fit:contain;transition:transform .35s ease}
 #homeView .feat-img:hover .feat-photo img{transform:scale(1.03)}
 #homeView .feat-row.feat-simple h2{font-size:18px}
+#homeView .feat-row.feat-info{background:var(--tint)}
+#homeView .feat-row.feat-info h2{font-size:18px}
+#homeView .feat-row.feat-info .feat-photo{cursor:default;aspect-ratio:1/1}
+#homeView .feat-row.feat-info .feat-photo img{object-fit:cover}
+#homeView .feat-inline-link{color:var(--ink);font-weight:800;text-decoration:none;border-bottom:2px solid var(--signal);padding-bottom:1px}
+#homeView .feat-inline-link:hover{color:var(--signal)}
 @media (max-width:820px){
   #homeView .feat-grid{grid-template-columns:1fr;gap:16px;background:transparent;padding:0 4px}
   #homeView .feat-row{grid-template-columns:1fr;gap:0;padding:0;border-radius:18px;overflow:hidden;border:1px solid var(--line);box-shadow:0 1px 3px rgba(20,20,20,.06),0 10px 26px rgba(20,20,20,.05)}
@@ -571,6 +577,14 @@ body.admin .v::after{content:" · адмін";color:#C2452D;font-weight:700}
           <a class="feat-link" href="#" onclick="openOrderModal();return false;">Замовити →</a>
         </div>
         <a class="feat-img" href="#" onclick="openOrderModal();return false;"><div class="feat-photo"><img src="img/service-maket.jpg" alt=""></div></a>
+      </div>
+
+      <div class="feat-row feat-info">
+        <div class="feat-text">
+          <h2>Доставка Новою Поштою</h2>
+          <p class="feat-plain">Банер пересилаємо скрученим у рулон на твердій основі — так він не мнеться і не ушкоджується в дорозі.<br><br>Через довжину рулону посилка не завжди проходить у звичайне поштове відділення (там приймають вантажі не довші за 120&nbsp;см). Тому при оформленні обирайте <b>вантажне відділення</b> або замовляйте <b>кур'єрську доставку на адресу</b>.<br><br>Доставляємо і в Україну, і в Європу. Міста з вантажними відділеннями Нової Пошти в Європі можна перевірити <a class="feat-inline-link" href="https://novaposhta.ua/international-send/" target="_blank" rel="noopener">за посиланням →</a></p>
+        </div>
+        <div class="feat-photo"><img src="img/np-info.jpg" alt="Банери скручені в рулон для доставки Новою Поштою"></div>
       </div>
 
     </div>
