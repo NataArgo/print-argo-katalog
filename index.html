@@ -446,8 +446,14 @@ body.admin .v::after{content:" · адмін";color:#C2452D;font-weight:700}
   text-decoration:none;color:var(--ink);padding:13px;font-weight:700;font-size:14px}
 #homeView .contact-mini:hover{border-color:var(--ink)}
 #homeView .contact-mini svg{width:16px;height:16px;flex:0 0 auto}
-.loadMoreBtn{display:block;margin:28px auto 8px;padding:13px 32px;border-radius:12px;border:2px solid var(--accent);background:#fff;color:var(--accent);font-size:15px;font-weight:700;cursor:pointer;transition:background .15s,color .15s}
-.loadMoreBtn:hover{background:var(--accent);color:#fff}
+.pager{display:flex;align-items:center;justify-content:center;gap:6px;margin:32px auto 12px;flex-wrap:wrap}
+.pagerBtn{min-width:38px;height:38px;padding:0 10px;border-radius:10px;border:2px solid #35B8C3;background:#fff;color:#35B8C3;font-size:14.5px;font-weight:700;cursor:pointer;transition:background .15s,color .15s}
+.pagerBtn:hover:not(:disabled){background:#35B8C3;color:#fff}
+.pagerBtn.pagerCur{background:#35B8C3;color:#fff;cursor:default}
+.pagerBtn.pagerDots{border-color:transparent;cursor:default;color:var(--gray);font-weight:400}
+.pagerBtn.pagerDots:hover{background:#fff;color:var(--gray)}
+.pagerBtn.pagerNav{font-weight:700}
+.pagerBtn:disabled{opacity:.4;cursor:default}
 </style>
 </head>
 <body>
@@ -771,7 +777,9 @@ const D={"fotofony": [{"id": "712", "title": "Фотофон", "img": "https://i
 {"id": "609", "img": "img/609.jpg", "local": true, "title": "Україна. Єдина. Вільна. Непереможна.", "events": ["День Незалежності", "День вишиванки"], "themes": ["вишиванка"], "heroes": [], "who": ["хлопчик", "дівчинка"], "age": "", "sizes": ["2×2"], "colors": ["блакитний/синій", "жовтий", "золото/беж"], "cats": ["Патріотичні"], "phash": "ef81d02ce4933bc3", "dhash": "c8234b0b272b6090"},
 {"id": "147_02", "img": "img/147_02.jpg", "local": true, "title": "З Днем Народження, Тимофійчику! 3 роки", "events": ["День Народження"], "themes": [], "heroes": ["Щенячий патруль"], "who": ["хлопчик"], "age": "1–6 років", "sizes": ["2×2"], "colors": ["оціни сама"], "cats": ["Дитячі"], "phash": "eba4d089b4966b69", "dhash": "c0330b27233b7080"},
 {"id": "272_06", "img": "img/272_06R.jpg", "local": true, "title": "Міньйони", "events": ["День Народження"], "themes": [], "heroes": ["Міньйони"], "who": [], "age": "1–8 років", "sizes": ["2×2"], "prev": "круглий", "colors": ["оціни сама"], "cats": ["Дитячі"], "phash": "eca5d291795ba464", "dhash": "f0e8960b17b6f010"},
-{"id": "342_09", "img": "img/342_09S.jpg", "local": true, "title": "Happy Birthday", "events": ["День Народження"], "themes": [], "heroes": ["Стіч"], "who": ["дівчинка"], "age": "3–10 років", "sizes": ["1,5×2"], "colors": ["рожевий", "блакитний/синій", "білий"], "cats": ["Дитячі"], "phash": "f0acda83e78df022", "dhash": "e0b6962a0e8cf010"}]};
+{"id": "342_09", "img": "img/342_09S.jpg", "local": true, "title": "Happy Birthday", "events": ["День Народження"], "themes": [], "heroes": ["Стіч"], "who": ["дівчинка"], "age": "3–10 років", "sizes": ["1,5×2"], "colors": ["рожевий", "блакитний/синій", "білий"], "cats": ["Дитячі"], "phash": "f0acda83e78df022", "dhash": "e0b6962a0e8cf010"},
+{"id": "458", "img": "img/458.jpg", "local": true, "title": "Незабутні миті шкільного життя", "events": ["Зі святом останнього дзвоника", "1 Вересня"], "themes": ["шкільний"], "heroes": [], "who": [], "age": "7–17 років", "sizes": ["2×2"], "colors": ["блакитний/синій", "білий", "сірий/срібний"], "cats": ["Сезонні"], "phash": "9eac4383e1449e3f", "dhash": "c0383c341c7cd090"},
+{"id": "458_02", "img": "img/458_02L.jpg", "local": true, "title": "1 Вересня. З Днем Знань! Новий початок, нові мрії, нові досягнення", "events": ["1 Вересня"], "themes": [], "heroes": [], "who": [], "age": "6–17 років", "sizes": ["2×3"], "colors": ["блакитний/синій", "білий"], "cats": ["Сезонні"], "phash": "c5a77808eb36b4c9", "dhash": "e0f0cc4ce2e2d008"}]};
 
 /* ───── Прайси (єдине місце цін на сайті) ───── */
 const PRICES={
@@ -797,7 +805,41 @@ const ROOMS={
 
 const state={room:"banery",q:"",cat:null,event:null,tag:null,age:null,who:null,colors:[],admin:localStorage.getItem("argoAdmin")==="1"};
 const PAGE_SIZE=40;
-state.visibleCount=PAGE_SIZE;
+state.page=1;
+function pageTokens(cur,total){
+  const delta=1,range=[],withDots=[];
+  for(let i=1;i<=total;i++){if(i===1||i===total||(i>=cur-delta&&i<=cur+delta))range.push(i);}
+  let last=null;
+  for(const i of range){
+    if(last!==null){
+      if(i-last===2)withDots.push(last+1);
+      else if(i-last>2)withDots.push("...");
+    }
+    withDots.push(i);last=i;
+  }
+  return withDots;
+}
+function buildPagination(list,gridEl){
+  const total=Math.ceil(list.length/PAGE_SIZE);
+  if(total<=1)return;
+  const nav=document.createElement('nav');
+  nav.className="pager";
+  const mkBtn=(label,page,extraCls)=>{
+    const b=document.createElement('button');
+    b.className="pagerBtn"+(extraCls?` ${extraCls}`:"");
+    b.textContent=label;
+    if(page)b.onclick=()=>{state.page=page;render({keepPage:true});gridEl.scrollIntoView({behavior:"smooth",block:"start"});};
+    else b.disabled=true;
+    return b;
+  };
+  if(state.page>1)nav.appendChild(mkBtn("‹",state.page-1,"pagerNav"));
+  pageTokens(state.page,total).forEach(tok=>{
+    if(tok==="...")nav.appendChild(mkBtn("…",null,"pagerDots"));
+    else nav.appendChild(mkBtn(String(tok),tok,tok===state.page?"pagerCur":""));
+  });
+  if(state.page<total)nav.appendChild(mkBtn("›",state.page+1,"pagerNav"));
+  gridEl.insertAdjacentElement('afterend',nav);
+}
 const CATS=[["all","Всі","all"],["Дитячі","Дитячі","baby"],["Дорослі свята","Дорослі свята","glass"],["Сезонні","Сезонні","leaf"],["Патріотичні","Патріотичні","tryzub"]];
 // підкатегорії, що показуються для кожної головної категорії
 const SUBCATS={
@@ -1341,7 +1383,7 @@ function cardKarkas(d){
 /* ───── Рендер розділу ───── */
 function render(opts){
   opts=opts||{};
-  if(!opts.keepPage)state.visibleCount=PAGE_SIZE;
+  if(!opts.keepPage)state.page=1;
   document.querySelectorAll(".nl").forEach(b=>b.classList.toggle("act",b.dataset.room===state.room));
   const R=ROOMS[state.room];
   $("#pTitle").textContent=R.title;
@@ -1355,30 +1397,26 @@ function render(opts){
   stateToURL();
   const g=$("#grid");g.innerHTML="";
   {const oldBtn=g.parentElement&&g.parentElement.querySelector(".loadMoreBtn");if(oldBtn)oldBtn.remove();}
+  {const oldPager=g.parentElement&&g.parentElement.querySelector(".pager");if(oldPager)oldPager.remove();}
   let list=[];
   let pageList=[];
+  const pageSlice=arr=>arr.slice((state.page-1)*PAGE_SIZE,state.page*PAGE_SIZE);
   if(state.room==="banery"){
     list=D.banery.filter(d=>bMatch(d,{})).slice().reverse();
-    pageList=list.slice(0,state.visibleCount);
+    pageList=pageSlice(list);
     pageList.forEach(d=>g.appendChild(cardBanner(d)));
     if(!list.length&&state.event)g.innerHTML=`<div class="empty"><b>Колекція «${state.event}» скоро</b>Ми додаємо макети поступово. Напишіть нам — підберемо або створимо дизайн під вашу подію.</div>`;
   }
-  if(state.room==="fotofony"){list=D.fotofony.filter(hitQ).slice().reverse();pageList=list.slice(0,state.visibleCount);pageList.forEach(d=>g.appendChild(cardSimple(d,"fotofon","від "+uah(PRICES.banner[0][1]),false)));}
-  if(state.room==="kutovi"){list=D.kutovi.filter(hitQ).slice().reverse();pageList=list.slice(0,state.visibleCount);pageList.forEach(d=>g.appendChild(cardSimple(d,"kutovi","від "+uah(PRICES.kutovi[0][1]),false)));}
-  if(state.room==="shyrmy"){list=D.shyrmy.filter(hitQ).slice().reverse();pageList=list.slice(0,state.visibleCount);pageList.forEach(d=>g.appendChild(cardSimple(d,"shyrma",uah(PRICES.shyrma)+" / секція",false)));}
+  if(state.room==="fotofony"){list=D.fotofony.filter(hitQ).slice().reverse();pageList=pageSlice(list);pageList.forEach(d=>g.appendChild(cardSimple(d,"fotofon","від "+uah(PRICES.banner[0][1]),false)));}
+  if(state.room==="kutovi"){list=D.kutovi.filter(hitQ).slice().reverse();pageList=pageSlice(list);pageList.forEach(d=>g.appendChild(cardSimple(d,"kutovi","від "+uah(PRICES.kutovi[0][1]),false)));}
+  if(state.room==="shyrmy"){list=D.shyrmy.filter(hitQ).slice().reverse();pageList=pageSlice(list);pageList.forEach(d=>g.appendChild(cardSimple(d,"shyrma",uah(PRICES.shyrma)+" / секція",false)));}
   if(state.room==="karkasy"){list=D.karkasy;pageList=list;list.forEach(d=>g.appendChild(cardKarkas(d)));
     const c=document.createElement('article');c.className="card";
     c.innerHTML=`<div class="ph" style="display:flex;align-items:center;justify-content:center"><div style="text-align:center;color:var(--gray);padding:20px"><div style="font-size:34px;margin-bottom:8px">📐</div>Потрібен інший розмір?<br>Порахуйте в калькуляторі</div></div><p class="ctitle">Каркас під ваш розмір</p><div class="crow"><span class="art">будь-які розміри</span></div>`;
     c.onclick=()=>openCalc();g.appendChild(c);
   }
   if(!g.innerHTML)g.innerHTML=`<div class="empty"><b>Нічого не знайшлося</b>Спробуйте інший запит.</div>`;
-  if(list.length>pageList.length){
-    const more=document.createElement('button');
-    more.className="loadMoreBtn";
-    more.textContent=`Завантажити ще (показано ${pageList.length} з ${list.length})`;
-    more.onclick=()=>{state.visibleCount+=PAGE_SIZE;render({keepPage:true});};
-    g.insertAdjacentElement('afterend',more);
-  }
+  buildPagination(list,g);
   const label=`<b>${list.length}</b> ${list.length%10===1&&list.length%100!==11?"позиція":(list.length%10>=2&&list.length%10<=4&&(list.length%100<10||list.length%100>=20)?"позиції":"позицій")}`;
   const cnt=$("#count");if(cnt)cnt.innerHTML=label;
   const cntM=$("#countM");if(cntM)cntM.innerHTML=label;
@@ -1485,9 +1523,48 @@ function igGoCat(){
   document.getElementById("igModalCat").style.display="none";
   window.open(IG,"_blank","noopener");
 }
-function closeProduct(){$("#pmodal").classList.remove("open");document.body.style.overflow="";}
+function closeProduct(){
+  const box=$(".pbox");
+  if(box){box.style.transition="";box.style.transform="";}
+  $("#pmodal").classList.remove("open");document.body.style.overflow="";
+}
 $("#pclose").onclick=closeProduct;
 $("#pmodal").addEventListener("click",e=>{if(e.target.id==="pmodal")closeProduct();});
+
+/* Свайп донизу для закриття картки товару (мобільні) */
+(function(){
+  const box=$(".pbox");
+  if(!box)return;
+  let startY=0,curY=0,dragging=false;
+  const THRESHOLD=90;
+  box.addEventListener("touchstart",e=>{
+    if(box.scrollTop>0)return; // закриваємо свайпом лише коли прокручено догори
+    startY=e.touches[0].clientY;curY=startY;dragging=true;
+    box.style.transition="none";
+  },{passive:true});
+  box.addEventListener("touchmove",e=>{
+    if(!dragging)return;
+    curY=e.touches[0].clientY;
+    const delta=curY-startY;
+    if(delta>0){
+      box.style.transform=`translateY(${delta}px)`;
+    }else{
+      dragging=false;box.style.transform="";
+    }
+  },{passive:true});
+  box.addEventListener("touchend",()=>{
+    if(!dragging)return;
+    dragging=false;
+    const delta=curY-startY;
+    box.style.transition="transform .2s ease";
+    if(delta>THRESHOLD){
+      box.style.transform=`translateY(100%)`;
+      setTimeout(closeProduct,180);
+    }else{
+      box.style.transform="";
+    }
+  });
+})();
 
 /* ───── Калькулятор ───── */
 function openCalc(id){
