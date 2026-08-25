@@ -798,7 +798,11 @@ const D={"fotofony": [{"id": "712", "title": "Фотофон", "img": "https://i
 {"id": "484_12L", "img": "img/484_12L.jpg", "local": true, "title": "1 вересня. З Днем знань!", "events": ["1 Вересня"], "themes": ["кулька", "шкільний"], "heroes": [], "who": [], "age": "", "sizes": ["2×3"], "colors": ["беж", "золото/беж", "коричневий"], "cats": ["Сезонні"], "phash": "cbabf094b42558cb", "dhash": "e4f959ce70f0c008"},
 {"id": "484_13", "img": "img/484_13.jpg", "local": true, "title": "Дзвоник у соняшниковому полі", "events": ["1 Вересня"], "themes": ["дзвоник", "соняшник"], "heroes": [], "who": [], "age": "", "sizes": ["2×2"], "colors": ["блакитний/синій", "жовтий", "білий"], "cats": ["Сезонні"], "phash": "f8acc68bf1063c69", "dhash": "d023370e0b33d090"},
 {"id": "300_13", "img": "img/300_13.jpg", "local": true, "title": "", "events": ["День Народження"], "themes": ["казковий замок"], "heroes": [], "who": [], "age": "", "sizes": ["2×2"], "colors": ["рожевий", "блакитний/синій", "золото/беж"], "cats": ["Дитячі"], "phash": "fea9c08cf043be4c", "dhash": "c0312b0f372dd090"},
-{"id": "330_3", "img": "img/330_3.jpg", "local": true, "title": "", "events": ["Різдво", "Новий Рік"], "themes": ["вишиванка", "зима"], "heroes": [], "who": [], "age": "", "sizes": ["2×2"], "colors": ["оціни сама"], "cats": ["Сезонні"], "phash": "fba9d696d1812872", "dhash": "c02333131b336090"}]};
+{"id": "330_3", "img": "img/330_3.jpg", "local": true, "title": "", "events": ["Різдво", "Новий Рік"], "themes": ["вишиванка", "зима"], "heroes": [], "who": [], "age": "", "sizes": ["2×2"], "colors": ["оціни сама"], "cats": ["Сезонні"], "phash": "fba9d696d1812872", "dhash": "c02333131b336090"},
+{"id": "345_02", "img": "img/345_02.jpg", "local": true, "title": "Happy Birthday", "events": ["День Народження"], "themes": ["кулька", "зірка"], "heroes": [], "who": [], "age": "1-8", "sizes": ["2×2"], "colors": ["синій", "білий", "сірий/срібний"], "cats": ["Дитячі"], "phash": "ebac9683f1146a4b", "dhash": "e0232b131b0bf090"},
+{"id": "280_07", "img": "img/280_07.jpg", "local": true, "title": "", "events": ["Ретро вечірка"], "themes": [], "heroes": [], "who": [], "age": "", "sizes": ["2×2"], "colors": ["оціни сама"], "cats": ["Дорослі свята"], "phash": "eeafd090d9062e71", "dhash": "c01b2b233b2bd090"},
+{"id": "246_02", "img": "img/246_02.jpg", "local": true, "title": "З Ювілеєм! 50", "events": ["Річниця"], "themes": ["кулька", "золото/беж"], "heroes": [], "who": [], "age": "", "sizes": ["2×2"], "colors": ["золото/беж", "білий"], "cats": ["Дорослі свята"], "phash": "eaacd5933409696e", "dhash": "f0cb131f0f1bd880"},
+{"id": "300_14L", "img": "img/300_14L.jpg", "local": true, "title": "", "events": ["День Народження"], "themes": ["казковий замок", "квіти"], "heroes": ["фея"], "who": [], "age": "", "sizes": ["2×3"], "colors": ["оціни сама"], "cats": ["Дитячі"], "phash": "dbabc484a6c11b7a", "dhash": "807579697579e008"}]};
 
 /* ───── Прайси (єдине місце цін на сайті) ───── */
 const PRICES={
@@ -1365,12 +1369,16 @@ function wordIncludes(hay,needle){
   }
   return false;
 }
+// прибирає нуль після підкреслення в артикулі: 346_02 -> 346_2, 484_013 -> 484_13
+// так пошук не розрізняє "з нулем" і "без нуля" в одній і тій самій позиції
+function normArtikul(s){return (s||"").replace(/_0+(\d)/g,'_$1');}
 function hitQ(d){
   if(!state.q)return true;
-  const hay=((d.title||"")+" "+d.id+" "+(d.themes||[]).join(" ")+" "+(d.heroes||[]).join(" ")+" "+(d.who||[]).join(" ")+" "+(d.events||[]).join(" ")).toLowerCase();
-  if(hay.includes(state.q))return true;
+  const hay=((d.title||"")+" "+d.id+" "+normArtikul(d.id)+" "+(d.themes||[]).join(" ")+" "+(d.heroes||[]).join(" ")+" "+(d.who||[]).join(" ")+" "+(d.events||[]).join(" ")).toLowerCase();
+  const q=state.q,qNorm=normArtikul(q);
+  if(hay.includes(q)||hay.includes(qNorm))return true;
   // пошук за синонімами (укр/англ/побутові написання) — тільки як ціле слово
-  return expandQuery(state.q).some(v=>wordIncludes(hay,v));
+  return expandQuery(q).some(v=>wordIncludes(hay,v));
 }
 
 /* ───── Картки ───── */
