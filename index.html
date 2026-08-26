@@ -1341,7 +1341,7 @@ function stateToURL(){
   if(state.colors&&state.colors.length)p.set("colors",state.colors.join(","));
   if(state.q)p.set("q",state.q);
   const qs=p.toString();
-  history.replaceState(null,"",location.pathname+(qs?"?"+qs:""));
+  history.replaceState(null,"",location.pathname+(qs?"?"+qs:"")+(location.hash||""));
 }
 function urlToState(){
   const p=new URLSearchParams(location.search);
@@ -1756,12 +1756,34 @@ async function shareCollection(){
 }
 const sb=$("#shareBtn");
 if(sb)sb.onclick=shareCollection;
-const favTop=$("#favTopBtn");
-if(favTop)favTop.onclick=()=>{
+function applyFavsView(){
   const hv=document.getElementById('homeView');if(hv)hv.style.display='none';
   const mn=document.querySelector('main.wrap');if(mn)mn.style.display='';
   state.showFavs=true;render();window.scrollTo({top:0});
-};
+}
+function applyRoomView(room){
+  const hv=document.getElementById('homeView');if(hv)hv.style.display='none';
+  const mn=document.querySelector('main.wrap');if(mn)mn.style.display='';
+  state.showFavs=false;state.room=room;render();window.scrollTo({top:0});
+}
+function enterFavs(){
+  if((location.hash||"").replace('#','')==='favs'){if(!state.showFavs)applyFavsView();return;}
+  location.hash='favs'; // створює запис в історії браузера, щоб кнопка "Назад" повертала на попередню сторінку
+}
+const favTop=$("#favTopBtn");
+if(favTop)favTop.onclick=enterFavs;
+// підтримка кнопок "Назад"/"Вперед" браузера
+function syncFromHash(){
+  const h=(location.hash||"").replace('#','');
+  if(h==='favs'){if(!state.showFavs)applyFavsView();}
+  else if(ROOMS[h]){if(state.showFavs||state.room!==h)applyRoomView(h);}
+  else if(h===''){
+    const hv=document.getElementById('homeView');
+    if(state.showFavs||(hv&&hv.style.display==='none')){state.showFavs=false;showHome();}
+  }
+}
+window.addEventListener('hashchange',syncFromHash);
+window.addEventListener('popstate',syncFromHash);
 updFavTopBtn();
 function showToast(msg){
   let el=document.getElementById("argoToast");
@@ -1808,7 +1830,8 @@ $("#shReset").onclick=()=>{resetFilters();buildSheet();render();};
 $("#sheet").addEventListener("click",e=>{if(e.target.id==="sheet"){closeSheet();render();}});
 buildMega();buildDrawer();
 const start=(location.hash||"#banery").slice(1);
-if(ROOMS[start])state.room=start;
+if(start==='favs'){state.showFavs=true;}
+else if(ROOMS[start])state.room=start;
 const _maketParam=new URLSearchParams(location.search).get("maket");
 urlToState();
 if(state.q){const qi=$("#q");if(qi){qi.value=state.q;const qc=$("#qClear");if(qc)qc.style.display="flex";}}
@@ -1818,7 +1841,7 @@ if(_maketParam){
   if(_p)openProduct({...(_p),kind:"banner"});
 }
 const _hashRoom=(location.hash||"").replace('#','');
-if(ROOMS[_hashRoom]){
+if(_hashRoom==='favs'||ROOMS[_hashRoom]){
   const hv=document.getElementById('homeView');if(hv)hv.style.display='none';
   const mn=document.querySelector('main.wrap');if(mn)mn.style.display='';
 }else{
