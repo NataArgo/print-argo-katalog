@@ -226,6 +226,23 @@ h1{font-weight:600;font-size:clamp(23px,3.4vw,32px);letter-spacing:-.02em;line-h
 .empty{grid-column:1/-1;padding:60px 0;color:var(--gray);text-align:center}
 .empty b{display:block;color:var(--ink);font-weight:600;margin-bottom:6px;font-size:16px}
 
+/* ── Улюблене ── */
+.favHeart{position:absolute;top:8px;right:8px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.92);box-shadow:0 2px 8px rgba(0,0,0,.14);border:none;display:flex;align-items:center;justify-content:center;z-index:2;cursor:pointer;transition:transform .15s}
+.favHeart:hover{transform:scale(1.08)}
+.favHeart svg{width:17px;height:17px;stroke:#E4483C;stroke-width:2;fill:none;transition:fill .15s}
+.favHeart.on svg{fill:#E4483C}
+.favTopBtn{position:relative;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;flex-shrink:0}
+.favTopBtn:hover{border-color:#E4483C}
+.favTopBtn svg{width:18px;height:18px;stroke:#E4483C;stroke-width:2;fill:none}
+.favTopBtn.has svg{fill:#E4483C}
+.favBadge{position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;padding:0 3px;border-radius:99px;background:#E4483C;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:1}
+.favBadge.zero{display:none}
+.favHeartModal{position:static;width:auto;height:auto;background:none;box-shadow:none;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:13.5px;font-weight:600;color:var(--ink);align-self:flex-start;cursor:pointer;transition:all .15s}
+.favHeartModal:hover{border-color:#E4483C}
+.favHeartModal svg{width:17px;height:17px;stroke:#E4483C;stroke-width:2;fill:none;transition:fill .15s}
+.favHeartModal.on{border-color:#E4483C;color:#E4483C}
+.favHeartModal.on svg{fill:#E4483C}
+
 /* ── Модал товару ── */
 .pmodal{position:fixed;inset:0;z-index:90;display:none;align-items:flex-end;justify-content:center;background:rgba(20,20,20,.45)}
 .pmodal.open{display:flex}
@@ -475,6 +492,10 @@ body.admin .v::after{content:" · адмін";color:#C2452D;font-weight:700}
     </div>
     <button class="calcbtn" id="shareBtn" title="Скопіювати посилання на цю добірку">Поділитися</button>
       <button class="calcbtn" id="openCalc">Калькулятор</button>
+    <button class="favTopBtn" id="favTopBtn" title="Улюблені макети" aria-label="Улюблені макети">
+      <svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-10-9C.5 8.5 2 4 6 4c2.2 0 3.7 1.3 6 4 2.3-2.7 3.8-4 6-4 4 0 5.5 4.5 4 8-2.5 4.4-10 9-10 9z"/></svg>
+      <span class="favBadge zero" id="favBadge">0</span>
+    </button>
     <button class="burger" id="burger" aria-label="Меню"><svg fill="none" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
   </div>
   <div class="mega" id="mega"><div class="mega-in" id="megaIn"></div></div>
@@ -828,7 +849,45 @@ const ROOMS={
   karkasy:{title:"Каркаси та стійки",lead:"Металеві розбірні каркаси під банер. Стандартні розміри зі складу або будь-який розмір під замовлення.",season:'Розділ · <b>Каркаси</b>'}
 };
 
-const state={room:"banery",q:"",cat:null,event:null,tag:null,age:null,who:null,colors:[],admin:localStorage.getItem("argoAdmin")==="1"};
+const state={room:"banery",q:"",cat:null,event:null,tag:null,age:null,who:null,colors:[],admin:localStorage.getItem("argoAdmin")==="1",showFavs:false};
+
+/* ───── Улюблене (localStorage, без реєстрації) ───── */
+function getFavs(){
+  try{return JSON.parse(localStorage.getItem("argoFavs")||"[]");}catch(e){return [];}
+}
+function isFav(kind,id){return getFavs().includes(kind+":"+id);}
+function toggleFav(kind,id){
+  const key=kind+":"+id;
+  let f=getFavs();
+  const i=f.indexOf(key);
+  if(i>=0)f.splice(i,1);else f.push(key);
+  localStorage.setItem("argoFavs",JSON.stringify(f));
+  updFavTopBtn();
+  return i<0; // true, якщо тепер додано в улюблене
+}
+function updFavTopBtn(){
+  const n=getFavs().length;
+  const btn=document.getElementById("favTopBtn"),badge=document.getElementById("favBadge");
+  if(btn)btn.classList.toggle("has",n>0);
+  if(badge){badge.textContent=n;badge.classList.toggle("zero",n===0);}
+}
+// збирає улюблені позиції з усіх розділів каталогу, кожна зі своїм kind і рендер-функцією картки
+function collectFavItems(){
+  const favs=getFavs();
+  if(!favs.length)return [];
+  const bySource=[
+    ["banner",D.banery,cardBanner],
+    ["fotofon",D.fotofony,d=>cardSimple(d,"fotofon","від "+uah(PRICES.banner[0][1]),false)],
+    ["kutovi",D.kutovi,d=>cardSimple(d,"kutovi","від "+uah(PRICES.kutovi[0][1]),false)],
+    ["shyrma",D.shyrmy,d=>cardSimple(d,"shyrma",uah(PRICES.shyrma)+" / секція",false)],
+    ["karkas",D.karkasy,cardKarkas]
+  ];
+  const out=[];
+  bySource.forEach(([kind,arr,makeCard])=>{
+    (arr||[]).forEach(d=>{if(favs.includes(kind+":"+d.id))out.push(makeCard(d));});
+  });
+  return out;
+}
 const PAGE_SIZE=40;
 state.page=1;
 function pageTokens(cur,total){
@@ -898,6 +957,7 @@ function showHome(){
 function go(room,ev){
   const hv=document.getElementById('homeView');if(hv)hv.style.display='none';
   const mn=document.querySelector('main.wrap');if(mn)mn.style.display='';
+  state.showFavs=false;
   state.room=room;state.event=ev||null;state.cat=null;state.tag=null;state.age=null;state.who=null;state.colors=[];state.q="";$("#q").value="";
   closeMega();closeDrawer();render();window.scrollTo({top:0});
   location.hash=room;
@@ -1384,27 +1444,42 @@ function hitQ(d){
 }
 
 /* ───── Картки ───── */
+const FAV_ICON='<svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-10-9C.5 8.5 2 4 6 4c2.2 0 3.7 1.3 6 4 2.3-2.7 3.8-4 6-4 4 0 5.5 4.5 4 8-2.5 4.4-10 9-10 9z"/></svg>';
+function favBtnHTML(kind,id){return `<button class="favHeart${isFav(kind,id)?" on":""}" data-fav-kind="${kind}" data-fav-id="${id}" aria-label="Додати в улюблене" title="Додати в улюблене">${FAV_ICON}</button>`;}
+function bindFavBtn(el,kind,id){
+  const b=el.querySelector('.favHeart');
+  if(!b)return;
+  b.onclick=(e)=>{
+    e.stopPropagation();
+    const on=toggleFav(kind,id);
+    b.classList.toggle("on",on);
+    if(state.showFavs&&!on)render(); // прибрали улюблене у режимі перегляду - оновити список
+  };
+}
 function cardBanner(d){
   const el=document.createElement('article');el.className="card";
-  el.innerHTML=`<div class="ph"><img src="${d.img}" alt="Макет № ${d.id}" loading="lazy" referrerpolicy="no-referrer"></div>
+  el.innerHTML=`<div class="ph">${favBtnHTML("banner",d.id)}<img src="${d.img}" alt="Макет № ${d.id}" loading="lazy" referrerpolicy="no-referrer"></div>
     <div class="crow"><span class="art">№ ${d.id.toUpperCase()}${(d.prev||[]).includes("круглий")?" · є круглий":(d.prev||[]).includes("арка")?" · арка":""}</span><span class="price">від ${uah(PRICES.banner[0][1])}</span></div>`;
+  bindFavBtn(el,"banner",d.id);
   el.onclick=()=>openProduct({kind:"banner",...d});
   return el;
 }
 function cardSimple(d,kind,fromPrice,cover){
   const el=document.createElement('article');el.className="card";
-  el.innerHTML=`<div class="ph${cover?" cover":""}"><img src="${d.img}" alt="${d.title}" loading="lazy" referrerpolicy="no-referrer"></div>
+  el.innerHTML=`<div class="ph${cover?" cover":""}">${favBtnHTML(kind,d.id)}<img src="${d.img}" alt="${d.title}" loading="lazy" referrerpolicy="no-referrer"></div>
     <p class="ctitle">${d.title}</p>
     <div class="crow"><span class="art">№ ${d.id}</span><span class="price">${fromPrice}</span></div>`;
+  bindFavBtn(el,kind,d.id);
   el.onclick=()=>openProduct({kind,...d});
   return el;
 }
 function cardKarkas(d){
   const el=document.createElement('article');el.className="card";
   const pr=PRICES.karkas.find(([s])=>s===d.size);
-  el.innerHTML=`<div class="ph"><img src="${d.img}" alt="Каркас ${d.size}" loading="lazy" referrerpolicy="no-referrer"></div>
+  el.innerHTML=`<div class="ph">${favBtnHTML("karkas",d.id)}<img src="${d.img}" alt="Каркас ${d.size}" loading="lazy" referrerpolicy="no-referrer"></div>
     <p class="ctitle">Каркас ${d.size}</p>
     <div class="crow"><span class="art">метал, розбірний</span><span class="price">${pr?uah(pr[1]):""}</span></div>`;
+  bindFavBtn(el,"karkas",d.id);
   el.onclick=()=>openProduct({kind:"karkas",...d});
   return el;
 }
@@ -1413,6 +1488,34 @@ function cardKarkas(d){
 function render(opts){
   opts=opts||{};
   if(!opts.keepPage)state.page=1;
+  updFavTopBtn();
+  if(state.showFavs){
+    document.querySelectorAll(".nl").forEach(b=>b.classList.remove("act"));
+    $("#pTitle").textContent="Улюблені макети";
+    $("#pLead").textContent="Все, що ви позначили сердечком — зберігається у вашому браузері.";
+    $("#side").style.display="none";
+    const contentEl=document.querySelector(".content");if(contentEl)contentEl.style.gridColumn="1 / -1";
+    const gridEl=$("#grid");if(gridEl)gridEl.classList.add("g4");
+    const cw=$("#catwrap");if(cw)cw.innerHTML="";
+    const cr=$("#crumbs");if(cr){cr.innerHTML=`<a data-go="home">Головна</a><span class="sep">›</span><span class="cur">Улюблені</span>`;
+      cr.querySelectorAll("[data-go]").forEach(a=>{a.onclick=()=>{state.showFavs=false;showHome();};});}
+    const mb=$("#mbar");if(mb)mb.innerHTML="";
+    stateToURL();
+    const g=$("#grid");g.innerHTML="";
+    {const oldBtn=g.parentElement&&g.parentElement.querySelector(".loadMoreBtn");if(oldBtn)oldBtn.remove();}
+    {const oldPager=g.parentElement&&g.parentElement.querySelector(".pager");if(oldPager)oldPager.remove();}
+    const items=collectFavItems();
+    if(!items.length){
+      g.innerHTML=`<div class="empty"><b>Поки що порожньо</b>Натисніть на сердечко ♥ на картці макета, який сподобався — він з'явиться тут.</div>`;
+    }else{
+      items.forEach(el=>g.appendChild(el));
+    }
+    const label=`<b>${items.length}</b> ${items.length%10===1&&items.length%100!==11?"позиція":(items.length%10>=2&&items.length%10<=4&&(items.length%100<10||items.length%100>=20)?"позиції":"позицій")}`;
+    const cnt=$("#count");if(cnt)cnt.innerHTML=label;
+    const cntM=$("#countM");if(cntM)cntM.innerHTML=label;
+    document.body.classList.toggle("admin",state.admin);
+    return;
+  }
   document.querySelectorAll(".nl").forEach(b=>b.classList.toggle("act",b.dataset.room===state.room));
   const R=ROOMS[state.room];
   $("#pTitle").textContent=R.title;
@@ -1497,6 +1600,7 @@ function openProduct(p){
   info.innerHTML=`
     <span class="art">${p.kind==="banner"?"Банер для фотозони":""}</span>
     <h2>${title}</h2>
+    <button class="favHeartModal${isFav(p.kind,p.id)?" on":""}" id="pmFav">${FAV_ICON}<span id="pmFavLabel">${isFav(p.kind,p.id)?"В улюбленому":"В улюблене"}</span></button>
     <p class="pnote">${note}</p>
     ${optsHtml}
     <p class="ptotal" id="total"></p>
@@ -1506,6 +1610,18 @@ function openProduct(p){
     </div>
     <a class="psrc" target="_blank" rel="noopener" href="${DRIVE_SEARCH}${encodeURIComponent(p.id)}">Вихідник (адмін)</a>`;
 
+  const pmFav=$("#pmFav");
+  if(pmFav){
+    pmFav.onclick=()=>{
+      const on=toggleFav(p.kind,p.id);
+      pmFav.classList.toggle("on",on);
+      $("#pmFavLabel").textContent=on?"В улюбленому":"В улюблене";
+      // якщо ми зараз у режимі перегляду улюблених і прибрали позицію — оновити картку в списку
+      if(state.showFavs){
+        document.querySelectorAll(`.favHeart[data-fav-kind="${p.kind}"][data-fav-id="${p.id}"]`).forEach(b=>b.classList.toggle("on",on));
+      }
+    };
+  }
   const total=$("#total"),order=$("#orderBtn");
   function upd(){
     let txt,msg;
@@ -1640,6 +1756,13 @@ async function shareCollection(){
 }
 const sb=$("#shareBtn");
 if(sb)sb.onclick=shareCollection;
+const favTop=$("#favTopBtn");
+if(favTop)favTop.onclick=()=>{
+  const hv=document.getElementById('homeView');if(hv)hv.style.display='none';
+  const mn=document.querySelector('main.wrap');if(mn)mn.style.display='';
+  state.showFavs=true;render();window.scrollTo({top:0});
+};
+updFavTopBtn();
 function showToast(msg){
   let el=document.getElementById("argoToast");
   if(!el){el=document.createElement("div");el.id="argoToast";el.className="argo-toast";document.body.appendChild(el);}
