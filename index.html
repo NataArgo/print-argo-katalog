@@ -26,6 +26,27 @@
 <meta name="twitter:title" content="print.АРГО — друк банерів для фотозон">
 <meta name="twitter:description" content="Понад 1300 макетів банерів для фотозон. Друк під ваш розмір, доставка по Україні.">
 <meta name="twitter:image" content="https://print-argo.com/img/og_image.jpg">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "print.АРГО",
+  "image": "https://print-argo.com/img/og_image.jpg",
+  "url": "https://print-argo.com/",
+  "telephone": "+380677701635",
+  "priceRange": "₴₴",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Хмельницький",
+    "addressCountry": "UA"
+  },
+  "sameAs": [
+    "https://www.instagram.com/print.argo",
+    "https://print-argo.prom.ua/ua/"
+  ],
+  "description": "Друк банерів для фотозон: макети банерів, фотофони, кутові фотофони, металеві каркаси та декоративні ширми. Доставка по Україні та Європі."
+}
+</script>
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="img/favicon_32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="img/favicon_192.png">
@@ -849,7 +870,7 @@ const ROOMS={
   karkasy:{title:"Каркаси та стійки",lead:"Металеві розбірні каркаси під банер. Стандартні розміри зі складу або будь-який розмір під замовлення.",season:'Розділ · <b>Каркаси</b>'}
 };
 
-const state={room:"banery",q:"",cat:null,event:null,tag:null,age:null,who:null,colors:[],admin:localStorage.getItem("argoAdmin")==="1",showFavs:false};
+const state={room:"banery",q:"",cat:null,event:null,tag:null,age:null,who:null,colors:[],admin:localStorage.getItem("argoAdmin")==="1",showFavs:false,sharedFavIds:null};
 
 /* ───── Улюблене (localStorage, без реєстрації) ───── */
 function getFavs(){
@@ -873,7 +894,7 @@ function updFavTopBtn(){
 }
 // збирає улюблені позиції з усіх розділів каталогу, кожна зі своїм kind і рендер-функцією картки
 function collectFavItems(){
-  const favs=getFavs();
+  const favs=state.sharedFavIds||getFavs();
   if(!favs.length)return [];
   const bySource=[
     ["banner",D.banery,cardBanner],
@@ -957,7 +978,7 @@ function showHome(){
 function go(room,ev){
   const hv=document.getElementById('homeView');if(hv)hv.style.display='none';
   const mn=document.querySelector('main.wrap');if(mn)mn.style.display='';
-  state.showFavs=false;
+  state.showFavs=false;state.sharedFavIds=null;
   state.room=room;state.event=ev||null;state.cat=null;state.tag=null;state.age=null;state.who=null;state.colors=[];state.q="";$("#q").value="";
   closeMega();closeDrawer();render();window.scrollTo({top:0});
   location.hash=room;
@@ -1491,8 +1512,13 @@ function render(opts){
   updFavTopBtn();
   if(state.showFavs){
     document.querySelectorAll(".nl").forEach(b=>b.classList.remove("act"));
-    $("#pTitle").textContent="Улюблені макети";
-    $("#pLead").textContent="Все, що ви позначили сердечком — зберігається у вашому браузері.";
+    if(state.sharedFavIds){
+      $("#pTitle").textContent="Добірка макетів";
+      $("#pLead").textContent="Ці макети підібрав для вас декоратор. Натисніть ♥, щоб зберегти сподобані собі.";
+    }else{
+      $("#pTitle").textContent="Улюблені макети";
+      $("#pLead").textContent="Все, що ви позначили сердечком — зберігається у вашому браузері.";
+    }
     $("#side").style.display="none";
     const contentEl=document.querySelector(".content");if(contentEl)contentEl.style.gridColumn="1 / -1";
     const gridEl=$("#grid");if(gridEl)gridEl.classList.add("g4");
@@ -1745,8 +1771,17 @@ $("#qClear").onclick=()=>{clearTimeout(qDebounce);const inp=$("#q");inp.value=""
 $("#shShow").onclick=()=>{closeSheet();render();};
 $("#shX").onclick=()=>{closeSheet();render();};
 async function shareCollection(){
-  stateToURL();
-  const link=location.href;
+  let link;
+  if(state.showFavs){
+    const favs=getFavs();
+    if(!favs.length){showToast("Спершу додайте макети в улюблене ♥");return;}
+    const p=new URLSearchParams();
+    p.set("favs",favs.join(","));
+    link=location.origin+location.pathname+"?"+p.toString()+"#favs";
+  }else{
+    stateToURL();
+    link=location.href;
+  }
   try{await navigator.clipboard.writeText(link);showToast("Посилання скопійовано ✓");}
   catch(e){
     const t=document.createElement("textarea");t.value=link;document.body.appendChild(t);t.select();
@@ -1764,10 +1799,11 @@ function applyFavsView(){
 function applyRoomView(room){
   const hv=document.getElementById('homeView');if(hv)hv.style.display='none';
   const mn=document.querySelector('main.wrap');if(mn)mn.style.display='';
-  state.showFavs=false;state.room=room;render();window.scrollTo({top:0});
+  state.showFavs=false;state.sharedFavIds=null;state.room=room;render();window.scrollTo({top:0});
 }
 function enterFavs(){
-  if((location.hash||"").replace('#','')==='favs'){if(!state.showFavs)applyFavsView();return;}
+  state.sharedFavIds=null; // кнопка в шапці завжди відкриває ВЛАСНЕ улюблене, не чужу надіслану добірку
+  if((location.hash||"").replace('#','')==='favs'){applyFavsView();return;}
   location.hash='favs'; // створює запис в історії браузера, щоб кнопка "Назад" повертала на попередню сторінку
 }
 const favTop=$("#favTopBtn");
@@ -1833,6 +1869,8 @@ const start=(location.hash||"#banery").slice(1);
 if(start==='favs'){state.showFavs=true;}
 else if(ROOMS[start])state.room=start;
 const _maketParam=new URLSearchParams(location.search).get("maket");
+const _favsParam=new URLSearchParams(location.search).get("favs");
+if(_favsParam){state.sharedFavIds=_favsParam.split(",").filter(Boolean);state.showFavs=true;}
 urlToState();
 if(state.q){const qi=$("#q");if(qi){qi.value=state.q;const qc=$("#qClear");if(qc)qc.style.display="flex";}}
 render();
